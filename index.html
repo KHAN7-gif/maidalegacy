@@ -1577,6 +1577,7 @@ textarea.m-input{border-radius:14px;resize:vertical}
   }
   .content{
     grid-column:2;
+    grid-row:1;
     background:var(--bg);
     border-radius:0;
     padding-bottom:40px;
@@ -1613,13 +1614,41 @@ textarea.m-input{border-radius:14px;resize:vertical}
   }
   .glass-content::before{
     content:'🏪 MDE Finance';
-    display:block;
+    display:flex;
+    align-items:center;
     font-size:14px;font-weight:900;
     color:var(--p);
     padding:0 10px 14px;
     border-bottom:1px solid var(--border);
     margin-bottom:12px;
     flex-shrink:0
+  }
+  /* Sidebar collapsed state */
+  .bottom-nav.sidebar-collapsed{
+    width:60px !important;max-width:60px !important;
+  }
+  .bottom-nav.sidebar-collapsed .glass-content::before{
+    content:'🏪';font-size:18px;padding:0 0 14px;justify-content:center;
+  }
+  .bottom-nav.sidebar-collapsed .tab span{display:none !important}
+  .bottom-nav.sidebar-collapsed .tab{
+    justify-content:center;padding:10px 0;
+  }
+  .bottom-nav.sidebar-collapsed .tab-ic{margin:0}
+  .bottom-nav.sidebar-collapsed .nav-sep{margin:4px 8px}
+  .bottom-nav.sidebar-collapsed #sidebarToggleBtn span{display:none !important}
+  .app.sidebar-collapsed{grid-template-columns:60px 1fr !important}
+  /* Sidebar toggle button */
+  #sidebarToggleBtn{
+    position:absolute;top:12px;right:10px;
+    width:26px;height:26px;border:none;border-radius:8px;
+    background:rgba(91,91,214,.1);color:var(--p);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    font-size:13px;transition:all .2s;z-index:10;flex-shrink:0
+  }
+  #sidebarToggleBtn:hover{background:rgba(91,91,214,.2)}
+  .bottom-nav.sidebar-collapsed #sidebarToggleBtn{
+    right:auto;left:50%;transform:translateX(-50%);top:12px;
   }
   .tab{
     flex-direction:row;gap:10px;
@@ -1696,11 +1725,13 @@ textarea.m-input{border-radius:14px;resize:vertical}
 
 <div class="app">
   <div class="content" id="root"></div>
-  <div class="bottom-nav" id="glassNav">
+  <div class="bottom-nav" id="glassNav" style="position:sticky">
     <!-- Liquid Glass Layers -->
     <div class="glass-filter"></div>
     <div class="glass-overlay"></div>
     <div class="glass-specular"></div>
+    <!-- Sidebar Toggle Button (desktop only) -->
+    <button id="sidebarToggleBtn" onclick="toggleSidebar()" title="Sembunyikan/Tunjuk sidebar">◀</button>
     <!-- Tab Content -->
     <div class="glass-content">
       <!-- ===== CORE TABS (always visible) ===== -->
@@ -2790,127 +2821,6 @@ function buildLineChart(mLabels, incomes, expenses) {
 // ================================================================
 //  RENDER HOME (SUMMARY)
 // ================================================================
-function renderHome() {
-  const totInc=getTotal('income'), totExp=getTotal('expense'), profit=totInc-totExp;
-  const margin=totInc>0?(profit/totInc)*100:0;
-  const savR=totInc>0?(profit/totInc)*100:0;
-  let hs=0,ht='',hc='';
-  if(savR>=30){hs=85;ht='Cemerlang';hc='ss-ex';}
-  else if(savR>=20){hs=70;ht='Baik';hc='ss-gd';}
-  else if(savR>=10){hs=55;ht='Sederhana';hc='ss-md';}
-  else{hs=40;ht='Kurang';hc='ss-pr';}
-  const circ=339.29, offset=circ*(1-hs/100);
-
-  // Real stats
-  const streak = calcStreak();
-  const totalDays = calcTotalDays();
-  const txCount = tx.length;
-
-  // 6-month line chart
-  const months=[{n:'Dis 2025',y:2025,m:11},{n:'Jan 2026',y:2026,m:0},{n:'Feb 2026',y:2026,m:1},{n:'Mac 2026',y:2026,m:2},{n:'Apr 2026',y:2026,m:3},{n:'Mei 2026',y:2026,m:4}];
-  const incs=months.map(m=>getMonthTotal('income',m.y,m.m));
-  const exps=months.map(m=>getMonthTotal('expense',m.y,m.m));
-  const chartLabels=['Dis 25','Jan 26','Feb 26','Mac 26','Apr 26','Mei 26'];
-  const chartSvg=buildLineChart(chartLabels,incs,exps);
-
-  // Monthly comparison (vs prev month)
-  const curMInc=getMonthTotal('income',curY,curM);
-  const curMExp=getMonthTotal('expense',curY,curM);
-  const pm=curM>0?curM-1:11, py=curM>0?curY:curY-1;
-  const prevMInc=getMonthTotal('income',py,pm);
-  const prevMExp=getMonthTotal('expense',py,pm);
-  const incChg=prevMInc>0?((curMInc-prevMInc)/prevMInc*100):0;
-  const expChg=prevMExp>0?((curMExp-prevMExp)/prevMExp*100):0;
-
-  return `
-    <div class="profile-hero">
-      <div class="profile-avatar">🏆</div>
-      <div class="profile-name">MAIDA LEGACY</div>
-      <div style="font-size:12px;color:var(--t2);margin-top:2px;font-weight:500">MDE Finance Pro · Maida Digital Enterprise</div>
-      <div class="profile-stats">
-        <div class="ps-item">
-          <div class="ps-val" style="color:${streak>=7?'var(--green)':streak>=3?'var(--amber)':'var(--t1)'}">${streak}🔥</div>
-          <div class="ps-lbl">Hari Berturut</div>
-          <div style="font-size:9px;color:var(--t3);margin-top:1px">${streak>=7?'Konsisten!':streak>=3?'Bagus!':'Mulakan!'}</div>
-        </div>
-        <div class="ps-item">
-          <div class="ps-val">${totalDays}</div>
-          <div class="ps-lbl">Hari Aktif</div>
-          <div style="font-size:9px;color:var(--t3);margin-top:1px">Sejak mula</div>
-        </div>
-        <div class="ps-item">
-          <div class="ps-val">${txCount}</div>
-          <div class="ps-lbl">Transaksi</div>
-          <div style="font-size:9px;color:var(--t3);margin-top:1px">${[...new Set(tx.map(t=>t.date))].length} hari rekod</div>
-        </div>
-      </div>
-    </div>
-    <div class="sec-hdr"><span class="sec-title">Ringkasan Keseluruhan</span></div>
-    <div class="stats-grid">
-      <div class="stat-box"><div class="stat-lbl">Pendapatan</div><div class="stat-val income">${fmt(totInc)}</div></div>
-      <div class="stat-box"><div class="stat-lbl">Perbelanjaan</div><div class="stat-val expense">${fmt(totExp)}</div></div>
-      <div class="stat-box"><div class="stat-lbl">Margin</div><div class="stat-val" style="color:var(--p)">${margin.toFixed(1)}%</div></div>
-    </div>
-    <div class="score-wrap">
-      <div class="score-box">
-        <div class="ring-wrap">
-          <svg width="96" height="96" viewBox="0 0 140 140">
-            <circle cx="70" cy="70" r="54" stroke="#e5e7eb" stroke-width="10" fill="none"/>
-            <circle cx="70" cy="70" r="54" stroke="#5b5bd6" stroke-width="10" fill="none" stroke-linecap="round"
-              stroke-dasharray="${circ}" stroke-dashoffset="${offset}" transform="rotate(-90 70 70)"/>
-          </svg>
-          <div class="ring-txt">${hs}</div>
-        </div>
-        <div class="score-detail">
-          <div class="score-lbl">Skor Kewangan</div>
-          <div class="score-status ${hc}">${ht}</div>
-        </div>
-        <div class="net-wrap">
-          <div class="net-amt ${profit>=0?'income':'expense'}">${fmtFull(profit)}</div>
-          <div class="trend-ind ${profit>=0?'ti-up':'ti-dn'}">${profit>=0?'▲ Untung':'▼ Rugi'}</div>
-        </div>
-      </div>
-    </div>
-    <div class="chart-wrap">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div class="sec-title">📈 Ringkasan 6 Bulan</div>
-        <div style="display:flex;gap:14px;font-size:11px;font-weight:700">
-          <span><span style="display:inline-block;width:20px;height:3px;background:#60a5fa;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Income</span>
-          <span><span style="display:inline-block;width:20px;height:3px;background:#f472b6;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Expenses</span>
-        </div>
-      </div>
-      <div style="overflow-x:auto">${chartSvg}</div>
-    </div>
-    <div class="sec-hdr"><span class="sec-title">Bulan Ini vs Bulan Lalu</span></div>
-    <div class="mom-row" style="padding:0 12px 14px">
-      <div class="mom-card">
-        <div class="mom-lbl">Pendapatan</div>
-        <div class="mom-amt income">${fmtFull(curMInc)}</div>
-        <span class="trend-pill ${incChg>=0?'tp-up':'tp-dn'}">${incChg>=0?'↑':'↓'} ${Math.abs(incChg).toFixed(1)}%</span>
-      </div>
-      <div class="mom-card">
-        <div class="mom-lbl">Perbelanjaan</div>
-        <div class="mom-amt expense">${fmtFull(curMExp)}</div>
-        <span class="trend-pill ${expChg>0?'tp-dn':'tp-up'}">${expChg>=0?'↑':'↓'} ${Math.abs(expChg).toFixed(1)}%</span>
-      </div>
-    </div>
-    <div class="menu-card">
-      <div class="menu-row" onclick="switchTab('calendar')"><div class="m-icon ci-bl">📅</div><div class="m-label">Transaksi Harian</div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="switchTab('record')"><div class="m-icon ci-gr">📋</div><div class="m-label">Senarai Rekod</div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="switchTab('analytic')"><div class="m-icon ci-pu">📊</div><div class="m-label">Analitik & Kategori</div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="switchTab('dokumen')" style="background:linear-gradient(135deg,#fff5f0,#fff)">
-        <div class="m-icon ci-or">📄</div>
-        <div style="flex:1"><div class="m-label">Dokumen & Sebutharga</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Invois · Cash Bill · Resit · Gaji</div></div>
-        <div style="background:#fee2e2;color:var(--red);font-size:10px;font-weight:800;padding:4px 10px;border-radius:var(--r-full)">BARU</div>
-      </div>
-      <div class="menu-row" onclick="switchTabFromMore('staff')" style="background:linear-gradient(135deg,#fdf4ff,#fff)"><div class="m-icon ci-pu">👤</div><div class="m-label">Profil Staff</div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="switchTabFromMore('gaji')" style="background:linear-gradient(135deg,#f0fdf4,#fff)"><div class="m-icon ci-gr">💼</div><div class="m-label">Rekod Gaji Staff</div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="switchTabFromMore('syer')" style="background:linear-gradient(135deg,#eff6ff,#fff)"><div class="m-icon ci-bl">💰</div><div class="m-label">Pembahagian Syer</div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="switchTab('ps_booking')" style="background:linear-gradient(135deg,#f0f9ff,#fff)"><div class="m-icon" style="background:#e0f0ff">🎮</div><div style="flex:1"><div class="m-label">PS Booking</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Panel station · Booking · Harga</div></div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="switchTab('ps_overlay')" style="background:linear-gradient(135deg,#fdf0ff,#fff)"><div class="m-icon" style="background:#f0e0ff">📺</div><div style="flex:1"><div class="m-label">PS Overlay</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Preview OBS langsung real-time</div></div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="switchTab('settings')"><div class="m-icon ci-te">⚙️</div><div class="m-label">Tetapan & Data</div><div class="m-arr">›</div></div>
-    </div>`;
-}
 
 // ================================================================
 //  RENDER ANALYTIC (month-aware, uses curY/curM)
@@ -3425,81 +3335,6 @@ function importJSON() {
 }
 
 
-function importJSON() {
-  const inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = '.json';
-  inp.onchange = e => {
-    const f = e.target.files[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = ev => {
-      try {
-        const d = JSON.parse(ev.target.result);
-
-        // Detect full backup format
-        if (d.version && d.transactions && d.categories) {
-          // Full backup restore
-          const confirm1 = confirm(
-            `📦 Fail backup penuh ditemui!\n\n` +
-            `• ${d.transactions.length} transaksi\n` +
-            `• ${(d.documents||[]).length} dokumen\n` +
-            `• Export pada: ${d.exportedAt?.slice(0,10)||'tidak diketahui'}\n\n` +
-            `Pilih:\n✅ OK = Gabung dengan data sedia ada\n❌ Cancel = Batal`
-          );
-          if (!confirm1) return;
-
-          let added = 0, skipped = 0;
-          d.transactions.forEach(item => {
-            if (item.date && item.type && item.amount) {
-              // Check duplicate by date+amount+type
-              const dup = tx.find(t => t.date===item.date && t.amount===item.amount && t.type===item.type && t.category===item.category);
-              if (!dup) { tx.push({...item, id: Date.now()+Math.random()}); added++; }
-              else skipped++;
-            }
-          });
-          // Merge categories
-          if (d.categories) {
-            ['income','expense'].forEach(type => {
-              (d.categories[type]||[]).forEach(cat => {
-                if (!cats[type].includes(cat)) cats[type].push(cat);
-              });
-            });
-          }
-          // Merge notes
-          if (d.notes) Object.assign(notes, d.notes);
-          // Merge documents
-          if (d.documents) {
-            d.documents.forEach(doc => {
-              if (!docs.find(x=>x.id===doc.id)) docs.push(doc);
-            });
-            saveDocs();
-          }
-          saveAll();
-          render();
-          alert(`✅ Import backup berjaya!\n${added} transaksi baru ditambah\n${skipped} rekod berganda dilangkau`);
-
-        } else if (Array.isArray(d)) {
-          // Simple array of transactions
-          let added = 0;
-          d.forEach(item => {
-            if (item.date && item.type && item.amount) {
-              tx.push({...item, id: Date.now()+Math.random()});
-              added++;
-            }
-          });
-          saveAll(); render();
-          alert(`✅ Import JSON berjaya!\n${added} transaksi ditambah.`);
-
-        } else {
-          alert('❌ Format JSON tidak dikenali.\nFail mesti mengandungi array transaksi atau fail backup penuh.');
-        }
-      } catch(err) {
-        alert('❌ Gagal import: ' + err.message);
-      }
-    };
-    r.readAsText(f);
-  };
-  inp.click();
-}
 
 function importExcelFile() {
   const inp = document.createElement('input');
@@ -4428,6 +4263,8 @@ function renderHome() {
       <div class="mom-card"><div class="mom-lbl">Perbelanjaan</div><div class="mom-amt expense">${fmtFull(curMExp)}</div><span class="trend-pill ${expChg>0?'tp-dn':'tp-up'}">${expChg>=0?'↑':'↓'} ${Math.abs(expChg).toFixed(1)}%</span></div>
     </div>
 
+    ${renderTop3Block()}
+
     <div class="menu-card">
       ${buildHomeMenu()}
     </div>`;}
@@ -4460,6 +4297,128 @@ function buildHomeMenu() {
   }).join('');
 }
 
+
+// ================================================================
+//  TOP 3 RANKING
+// ================================================================
+function renderTop3Block(){
+  if(typeof window._top3Period==='undefined') window._top3Period='hari';
+  const period=window._top3Period;
+  const now=new Date();
+  const MN=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+  const fmtD=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const fmtM=d=>`${MN[d.getMonth()]} ${d.getFullYear()}`;
+
+  const todStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const dow=now.getDay();const diffMon=dow===0?-6:1-dow;
+  const mon=new Date(now);mon.setDate(now.getDate()+diffMon);
+  const monStr=`${mon.getFullYear()}-${String(mon.getMonth()+1).padStart(2,'0')}-${String(mon.getDate()).padStart(2,'0')}`;
+  const yearStr=`${now.getFullYear()}`;
+  const monthStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  // Date range label for each period
+  const jan1=`${now.getFullYear()}-01-01`;
+  const dateRangeLabel={
+    hari: fmtD(now),
+    minggu: `${fmtD(mon)} – ${fmtD(now)}`,
+    bulan: fmtM(now),
+    tahun: `Jan ${now.getFullYear()} – ${MN[now.getMonth()]} ${now.getFullYear()}`
+  }[period];
+
+  function filterByPeriod(t){
+    if(t.type!=='income') return false;
+    if(period==='hari')  return t.date===todStr;
+    if(period==='minggu')return t.date>=monStr&&t.date<=todStr;
+    if(period==='bulan') return t.date&&t.date.startsWith(monthStr);
+    if(period==='tahun') return t.date&&t.date.startsWith(yearStr);
+    return false;
+  }
+
+  // Aggregate by category — also track count, first & last date
+  const catData={};
+  tx.filter(filterByPeriod).forEach(t=>{
+    const cat=t.category||'Lain-lain';
+    if(!catData[cat]) catData[cat]={total:0,count:0,dates:[]};
+    catData[cat].total+=(t.amount||0);
+    catData[cat].count++;
+    if(t.date) catData[cat].dates.push(t.date);
+  });
+
+  const sorted=Object.entries(catData).sort((a,b)=>b[1].total-a[1].total).slice(0,3);
+  const medals=['🥇','🥈','🥉'];
+  const medalColors=['#f59e0b','#9ca3af','#cd7c2f'];
+  const medalBg=['rgba(245,158,11,.08)','rgba(156,163,175,.07)','rgba(205,124,47,.07)'];
+  const medalBorder=['rgba(245,158,11,.25)','rgba(156,163,175,.2)','rgba(205,124,47,.2)'];
+
+  const periodLabel={hari:'Hari Ini',minggu:'Minggu Ini',bulan:'Bulan Ini',tahun:'Tahun Ini'}[period];
+  const tabs=['hari','minggu','bulan','tahun'];
+  const tabLabels=['Harian','Minggu','Bulan','Tahun'];
+
+  const tabsHtml=tabs.map((t,i)=>`<button onclick="window._top3Period='${t}';render()" style="padding:5px 13px;border:none;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;background:${period===t?'#5b5bd6':'transparent'};color:${period===t?'#fff':'var(--t2)'}">${tabLabels[i]}</button>`).join('');
+
+  const rankHtml=sorted.length===0
+    ?`<div style="text-align:center;padding:18px 0;color:var(--t3);font-size:13px">Tiada rekod income ${periodLabel.toLowerCase()}</div>`
+    :sorted.map(([cat,data],i)=>{
+      const dates=data.dates.sort();
+      // Build specific date string
+      let dateStr='';
+      if(period==='hari'){
+        dateStr=fmtD(now);
+      } else if(period==='minggu'){
+        const first=dates[0],last=dates[dates.length-1];
+        dateStr=first===last?fmtD(new Date(first+' 12:00')):`${fmtD(new Date(first+' 12:00'))} – ${fmtD(new Date(last+' 12:00'))}`;
+      } else if(period==='bulan'){
+        dateStr=fmtM(now);
+      } else {
+        // Tahun — show month range of actual transactions
+        if(dates.length>0){
+          const firstM=new Date(dates[0]+' 12:00');
+          const lastM=new Date(dates[dates.length-1]+' 12:00');
+          dateStr=firstM.getMonth()===lastM.getMonth()&&firstM.getFullYear()===lastM.getFullYear()
+            ?fmtM(firstM)
+            :`${MN[firstM.getMonth()]} – ${MN[lastM.getMonth()]} ${lastM.getFullYear()}`;
+        } else dateStr=dateRangeLabel;
+      }
+      return`<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:${medalBg[i]};border:1.5px solid ${medalBorder[i]};margin-bottom:8px">
+        <div style="font-size:28px;width:36px;text-align:center;flex-shrink:0">${medals[i]}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cat}</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px">
+            <span style="font-size:11px;color:var(--t2)">#${i+1} Tertinggi</span>
+            <span style="width:3px;height:3px;border-radius:50%;background:var(--t3);flex-shrink:0"></span>
+            <span style="font-size:11px;color:var(--t2)">📅 ${dateStr}</span>
+            <span style="width:3px;height:3px;border-radius:50%;background:var(--t3);flex-shrink:0"></span>
+            <span style="font-size:11px;color:var(--t2)">${data.count} transaksi</span>
+          </div>
+        </div>
+        <div style="font-size:16px;font-weight:900;color:${medalColors[i]};white-space:nowrap;text-align:right">
+          RM ${data.total.toFixed(2)}
+        </div>
+      </div>`;
+    }).join('');
+
+  // Summary bar
+  const grandTotal=sorted.reduce((s,[,d])=>s+d.total,0);
+  const summaryBar=sorted.length>0?`
+    <div style="padding:8px 14px 12px;border-top:1px solid var(--border);margin-top:4px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;font-weight:700;color:var(--t2)">📊 ${dateRangeLabel}</span>
+      <span style="font-size:13px;font-weight:900;color:var(--p)">Jumlah Top 3: RM ${grandTotal.toFixed(2)}</span>
+    </div>`:'';
+
+  return `
+    <div class="sec-hdr"><span class="sec-title">🏆 Top 3 Ranking (Income)</span></div>
+    <div style="margin:0 12px 14px;background:var(--card);border-radius:var(--r-xl);box-shadow:var(--sh-sm);overflow:hidden;border:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:4px;padding:10px 14px 8px;border-bottom:1px solid var(--border);background:rgba(91,91,214,.04);flex-wrap:wrap">
+        ${tabsHtml}
+      </div>
+      <div style="padding:12px 14px 4px">${rankHtml}</div>
+      ${summaryBar}
+    </div>`;
+}
+
+// ================================================================
+//  HOME MENU & EVENTS
+// ================================================================
 window.dismissNotif = function(id) { dismissedNotifs.add(id); render(); };
 window.setMonthTarget = function() {
   const v = parseFloat(document.getElementById('targetInput')?.value);
@@ -6819,6 +6778,7 @@ window.tryLogin = () => {
     document.getElementById('lockError').classList.remove('show');
     resetLockTimer();
     applyTabVisibility();
+    restoreSidebarState();
     // Buka Transaksi bulan semasa
     activeTab='calendar';
     const now=new Date();
@@ -7256,6 +7216,33 @@ function applyTabVisibility() {
 // ================================================================
 //  INIT
 // ================================================================
+// ================================================================
+//  SIDEBAR TOGGLE (Desktop only)
+// ================================================================
+function toggleSidebar(){
+  const nav=document.getElementById('glassNav');
+  const app=document.querySelector('.app');
+  const btn=document.getElementById('sidebarToggleBtn');
+  if(!nav||!app) return;
+  const isCollapsed=nav.classList.toggle('sidebar-collapsed');
+  app.classList.toggle('sidebar-collapsed', isCollapsed);
+  if(btn) btn.textContent=isCollapsed?'▶':'◀';
+  localStorage.setItem('mde_sidebar_collapsed', isCollapsed?'1':'0');
+}
+
+function restoreSidebarState(){
+  if(window.innerWidth<1024) return; // Mobile — skip
+  const collapsed=localStorage.getItem('mde_sidebar_collapsed')==='1';
+  if(collapsed){
+    const nav=document.getElementById('glassNav');
+    const app=document.querySelector('.app');
+    const btn=document.getElementById('sidebarToggleBtn');
+    if(nav) nav.classList.add('sidebar-collapsed');
+    if(app) app.classList.add('sidebar-collapsed');
+    if(btn) btn.textContent='▶';
+  }
+}
+
 // ================================================================
 //  INIT — Load all data then show app
 // ================================================================
