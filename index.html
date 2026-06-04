@@ -1623,37 +1623,6 @@ textarea.m-input{border-radius:14px;resize:vertical}
     margin-bottom:12px;
     flex-shrink:0
   }
-  /* Sidebar collapsed state */
-  .bottom-nav.sidebar-collapsed{
-    width:60px !important;max-width:60px !important;
-  }
-  .bottom-nav.sidebar-collapsed .glass-content::before{
-    content:'🏪';font-size:18px;padding:0 0 14px;justify-content:center;
-  }
-  .bottom-nav.sidebar-collapsed .tab span{display:none !important}
-  .bottom-nav.sidebar-collapsed .tab{
-    justify-content:center;padding:10px 0;
-  }
-  .bottom-nav.sidebar-collapsed .tab-ic{margin:0}
-  .bottom-nav.sidebar-collapsed .nav-sep{margin:4px 8px}
-  .bottom-nav.sidebar-collapsed #sidebarToggleBtn span{display:none !important}
-  .app.sidebar-collapsed{grid-template-columns:60px 1fr !important}
-  /* Sidebar toggle button */
-  #sidebarToggleBtn{
-    position:absolute;top:12px;right:10px;
-    width:26px;height:26px;border:none;border-radius:8px;
-    background:rgba(91,91,214,.1);color:var(--p);
-    cursor:pointer;display:none;align-items:center;justify-content:center;
-    font-size:13px;transition:all .2s;z-index:10;flex-shrink:0
-  }
-  #sidebarToggleBtn:hover{background:rgba(91,91,214,.2)}
-  /* Sidebar toggle button — desktop only */
-  #sidebarToggleBtn{
-    display:flex !important;
-  }
-  .bottom-nav.sidebar-collapsed #sidebarToggleBtn{
-    right:auto;left:50%;transform:translateX(-50%);top:12px;
-  }
   .tab{
     flex-direction:row;gap:10px;
     padding:10px 12px;border-radius:var(--r-lg);
@@ -1734,11 +1703,9 @@ textarea.m-input{border-radius:14px;resize:vertical}
     <div class="glass-filter"></div>
     <div class="glass-overlay"></div>
     <div class="glass-specular"></div>
-    <!-- Sidebar Toggle Button (desktop only) -->
-    <button id="sidebarToggleBtn" onclick="toggleSidebar()" title="Sembunyikan/Tunjuk sidebar">◀</button>
     <!-- Tab Content -->
     <div class="glass-content">
-      <!-- ===== CORE TABS (always visible) ===== -->
+      <!-- ===== MOBILE BOTTOM NAV (4 tabs) ===== -->
       <div class="tab on" data-tab="home">
         <div class="tab-ic"><svg viewBox="0 0 24 24"><path d="M3 9L12 3l9 6v11a1 1 0 01-1 1H5a1 1 0 01-1-1V9z" stroke="currentColor"/><path d="M9 22V12h6v10" stroke="currentColor"/></svg></div>
         <span>Home</span>
@@ -1747,13 +1714,13 @@ textarea.m-input{border-radius:14px;resize:vertical}
         <div class="tab-ic"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-linecap="round"/></svg></div>
         <span>PS Booking</span>
       </div>
-      <div class="tab" data-tab="calendar">
-        <div class="tab-ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="2" stroke="currentColor"/><path d="M8 3v3M16 3v3M3 10h18" stroke="currentColor"/></svg></div>
-        <span>Transaksi</span>
-      </div>
       <div class="tab mob-only" data-tab="analytic">
         <div class="tab-ic"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-linecap="round"/></svg></div>
-        <span>Analisa</span>
+        <span>Analitik</span>
+      </div>
+      <div class="tab mob-only" data-tab="_more">
+        <div class="tab-ic" style="position:relative"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span id="notifBadgeDot" style="display:none;position:absolute;top:-1px;right:-1px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff"></span></div>
+        <span>Lagi</span>
       </div>
       <div class="tab desk-only" data-tab="pelanggan">
         <div class="tab-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" stroke="currentColor"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-linecap="round"/></svg></div>
@@ -1766,12 +1733,6 @@ textarea.m-input{border-radius:14px;resize:vertical}
       <div class="tab desk-only" data-tab="staff">
         <div class="tab-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-linecap="round"/><circle cx="19" cy="7" r="2.5" stroke="currentColor"/><path d="M17 12.5a5 5 0 014 0" stroke="currentColor" stroke-linecap="round"/></svg></div>
         <span>Staff</span>
-      </div>
-
-      <!-- ===== MOBILE ONLY: Lagi button ===== -->
-      <div class="tab mob-only" data-tab="_more">
-        <div class="tab-ic" style="position:relative"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span id="notifBadgeDot" style="display:none;position:absolute;top:-1px;right:-1px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff"></span></div>
-        <span>Lagi</span>
       </div>
 
       <!-- ===== DESKTOP ONLY: Expanded nav ===== -->
@@ -6782,7 +6743,6 @@ window.tryLogin = () => {
     document.getElementById('lockError').classList.remove('show');
     resetLockTimer();
     applyTabVisibility();
-    restoreSidebarState();
     // Buka Transaksi bulan semasa
     activeTab='calendar';
     const now=new Date();
@@ -7191,34 +7151,22 @@ function applyTabVisibility() {
     if (!tab || tab === '_more') return;
 
     const isDesktopOnly = t.classList.contains('desk-only');
-    const isMobOnly = t.classList.contains('mob-only');
-    const isAlways = !isDesktopOnly && !isMobOnly; // no class = show everywhere
-
-    // Core tabs always visible regardless of permissions
-    const isCoreTab = tab === 'home' || tab === 'calendar';
-
+    const isMobOnly     = t.classList.contains('mob-only');
+    const isCoreTab     = tab === 'home' || tab === 'calendar';
     const hasPermission = isCoreTab || perms.includes(tab);
 
+    // First: hide if no permission
     if (!hasPermission) {
-      t.style.setProperty('display', 'none', 'important');
+      t.style.cssText += ';display:none!important';
       return;
     }
 
-    // Restore correct display based on device + class
-    if (isMobile) {
-      if (isDesktopOnly) {
-        t.style.setProperty('display', 'none', 'important');
-      } else {
-        // mob-only or no-class: show on mobile
-        t.style.removeProperty('display');
-      }
-    } else {
-      // Desktop
-      if (isMobOnly) {
-        t.style.setProperty('display', 'none', 'important');
-      } else {
-        t.style.removeProperty('display');
-      }
+    // Then: apply responsive visibility
+    t.style.removeProperty('display');
+    if (isMobile && isDesktopOnly) {
+      t.style.cssText += ';display:none!important';
+    } else if (!isMobile && isMobOnly) {
+      t.style.cssText += ';display:none!important';
     }
   });
 }
@@ -7229,32 +7177,6 @@ function applyTabVisibility() {
 // ================================================================
 //  INIT
 // ================================================================
-// ================================================================
-//  SIDEBAR TOGGLE (Desktop only)
-// ================================================================
-function toggleSidebar(){
-  const nav=document.getElementById('glassNav');
-  const app=document.querySelector('.app');
-  const btn=document.getElementById('sidebarToggleBtn');
-  if(!nav||!app) return;
-  const isCollapsed=nav.classList.toggle('sidebar-collapsed');
-  app.classList.toggle('sidebar-collapsed', isCollapsed);
-  if(btn) btn.textContent=isCollapsed?'▶':'◀';
-  localStorage.setItem('mde_sidebar_collapsed', isCollapsed?'1':'0');
-}
-
-function restoreSidebarState(){
-  if(window.innerWidth<1024) return; // Mobile — skip
-  const collapsed=localStorage.getItem('mde_sidebar_collapsed')==='1';
-  if(collapsed){
-    const nav=document.getElementById('glassNav');
-    const app=document.querySelector('.app');
-    const btn=document.getElementById('sidebarToggleBtn');
-    if(nav) nav.classList.add('sidebar-collapsed');
-    if(app) app.classList.add('sidebar-collapsed');
-    if(btn) btn.textContent='▶';
-  }
-}
 
 // ================================================================
 //  INIT — Load all data then show app
