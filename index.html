@@ -1388,7 +1388,76 @@ textarea.m-input{border-radius:14px;resize:vertical}
 .ps-mb-c{background:rgba(0,0,0,.07);color:var(--t2)}.ps-mb-c:hover{background:rgba(0,0,0,.1)}
 .ps-mb-ok{background:#007aff;color:#fff;box-shadow:0 4px 12px rgba(0,122,255,.3)}.ps-mb-ok:hover{opacity:.9}
 .ps-mb-d{background:#ff3b30;color:#fff;box-shadow:0 4px 12px rgba(255,59,48,.3)}.ps-mb-d:hover{opacity:.9}
-/* ===================== PS OVERLAY MODULE ===================== */
+/* ===== PS BOOKING MOBILE NAV ===== */
+.ps-mob-nav{
+  display:none;
+  position:sticky;bottom:0;left:0;right:0;z-index:60;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(0,0,0,.08);
+  padding:6px 8px calc(6px + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 20px rgba(0,0,0,.08);
+}
+.ps-mob-nav-inner{display:flex;gap:4px;justify-content:space-around}
+.ps-mnt{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:7px 4px;border:none;background:transparent;cursor:pointer;font-family:inherit;
+  border-radius:12px;transition:all .18s;
+}
+.ps-mnt.on{background:rgba(0,122,255,.1)}
+.ps-mnt-ico{font-size:18px;line-height:1}
+.ps-mnt-lbl{font-size:9px;font-weight:700;color:var(--t2);letter-spacing:.2px}
+.ps-mnt.on .ps-mnt-lbl{color:#007aff}
+@media(max-width:767px){
+  .ps-mob-nav{display:block}
+  .ps-hdr .ps-hnav{display:none !important}
+  .ps-hdr{padding:8px 14px;height:52px}
+  .ps-hb .nm{font-size:13px}
+  .ps-hst{gap:6px}
+  .ps-hsp{font-size:11px;padding:4px 8px}
+  .ps-hclk{font-size:11px;min-width:56px}
+  .ps-body{padding:12px 12px 80px}
+}
+/* ===== ACTION POPUP ===== */
+.ps-act-sheet{
+  position:fixed;inset:0;z-index:9995;
+  display:none;align-items:flex-end;justify-content:center;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.ps-act-sheet.show{display:flex;animation:ps-sheet-in .25s cubic-bezier(.34,1.2,.64,1)}
+@keyframes ps-sheet-in{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.ps-act-box{
+  background:#fff;border-radius:24px 24px 0 0;
+  width:100%;max-width:480px;padding:8px 16px calc(20px + env(safe-area-inset-bottom));
+  box-shadow:0 -8px 40px rgba(0,0,0,.18);
+}
+@media(min-width:480px){.ps-act-box{border-radius:24px;margin-bottom:20px;max-width:400px}}
+.ps-act-handle{width:36px;height:4px;background:#d1d5db;border-radius:2px;margin:8px auto 14px}
+.ps-act-title{font-size:14px;font-weight:900;color:var(--t1);margin-bottom:4px;text-align:center}
+.ps-act-sub{font-size:12px;color:var(--t2);text-align:center;margin-bottom:16px;line-height:1.5}
+.ps-act-btns{display:flex;flex-direction:column;gap:8px}
+.ps-act-btn{
+  width:100%;padding:14px 16px;border:none;border-radius:14px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:12px;transition:all .18s;text-align:left;
+}
+.ps-act-btn-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ps-act-btn-text{flex:1}
+.ps-act-btn-name{font-size:14px;font-weight:800;line-height:1}
+.ps-act-btn-desc{font-size:11px;font-weight:500;opacity:.65;margin-top:2px}
+.ps-act-btn.ab-tamat{background:rgba(255,59,48,.08);color:#dc2626}
+.ps-act-btn.ab-tamat .ps-act-btn-icon{background:rgba(255,59,48,.15)}
+.ps-act-btn.ab-1h{background:rgba(175,82,222,.08);color:#7c3aed}
+.ps-act-btn.ab-1h .ps-act-btn-icon{background:rgba(175,82,222,.15)}
+.ps-act-btn.ab-joy{background:rgba(255,149,0,.08);color:#d97706}
+.ps-act-btn.ab-joy .ps-act-btn-icon{background:rgba(255,149,0,.15)}
+.ps-act-btn.ab-print{background:rgba(52,199,89,.08);color:#16a34a}
+.ps-act-btn.ab-print .ps-act-btn-icon{background:rgba(52,199,89,.15)}
+.ps-act-btn.ab-batal{background:rgba(107,114,128,.08);color:#374151}
+.ps-act-btn.ab-batal .ps-act-btn-icon{background:rgba(107,114,128,.12)}
+.ps-act-btn.ab-selesai-print{background:rgba(52,199,89,.08);color:#16a34a}
+.ps-act-btn.ab-selesai-print .ps-act-btn-icon{background:rgba(52,199,89,.15)}
+.ps-act-cancel-btn{width:100%;padding:13px;border:none;border-radius:14px;background:#f3f4f6;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+
 .ps-ovl-wrap{padding:0 0 20px}
 .ps-ovl-info{background:linear-gradient(135deg,rgba(0,0,0,.8),rgba(30,30,60,.9));color:#fff;border-radius:20px;padding:20px 24px;margin:16px}
 .ps-ovl-title{font-size:18px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
@@ -5978,6 +6047,7 @@ function psGetFilteredList(){
   else if(ps_lFilt.period==='week')fil=fil.filter(b=>b.date>=wStr);
   else if(ps_lFilt.period==='month')fil=fil.filter(b=>b.date.startsWith(monStr));
   else if(ps_lFilt.period==='custom')fil=fil.filter(b=>b.date===ps_lDate);
+  // 'all' = no date filter applied
   if(ps_lFilt.status==='aktif')fil=fil.filter(b=>b.status==='a');
   else if(ps_lFilt.status==='selesai')fil=fil.filter(b=>b.status==='s');
   // batal already filtered above
@@ -6090,38 +6160,23 @@ function psSyncToTransaksi(tarikh,tot,count,periodeLabel){
 }
 
 function psRList(){
+  const isAdmin=currentUser?.role==='Admin';
   const fil=psGetFilteredList();
-  // For total: exclude cancelled bookings from amount
   const tot=fil.filter(b=>b.status!=='x').reduce((s,b)=>s+b.amt,0);
   const pAmt={'cash':0,'qr':0,'fpx':0};
   fil.filter(b=>b.status!=='x').forEach(b=>pAmt[b.payment||'cash']=(pAmt[b.payment||'cash']||0)+b.amt);
   const rows=fil.map(b=>{
     const st=PS_STATIONS.find(s=>s.id===b.sid);const rem=b.status==='a'?psGetRemMs(b):0;
-    const isAktif=b.status==='a';
-    const isSelesai=b.status==='s';
-    const isBatal=b.status==='x';
+    const isAktif=b.status==='a';const isBatal=b.status==='x';
     const xs=[b.xDS4&&'DS4',b.xDS5&&'DS5'].filter(Boolean).join('+');
     const payIco={'cash':'💵','qr':'📱','fpx':'🏦'}[b.payment||'cash']||'';
     let statusBadge='';
     if(isAktif)statusBadge=`<span class="ps-sp ps-sp-a">AKTIF</span>`;
-    else if(isSelesai)statusBadge=`<span class="ps-sp ps-sp-s">SELESAI</span>`;
+    else if(b.status==='s')statusBadge=`<span class="ps-sp ps-sp-s">SELESAI</span>`;
     else if(isBatal)statusBadge=`<span class="ps-sp ps-sp-batal">DIBATALKAN</span>`;
     const acts=isBatal
-      ?`<div class="ps-rab">
-          <span style="font-size:11px;color:var(--t3);font-style:italic">Dibatalkan</span>
-        </div>`
-      :isAktif
-        ?`<div class="ps-rab">
-            <button class="ps-rb2 ps-rb-e" title="Tamat sesi" onclick="psEndFromList(${b.id})">⏹</button>
-            <button class="ps-rb2 ps-rb-x" title="+1 jam" onclick="psAdd1h(${b.id})">+1j</button>
-            <button class="ps-rb2 ps-rb-j" title="Tambah joystik" onclick="psAddJoy(${b.id})">+Joy</button>
-            <button class="ps-rb2 ps-rb-p" title="Cetak resit" onclick="psPrintResit(${b.id})">🖨</button>
-            <button class="ps-rb2 ps-rb-batal" title="Batalkan booking" onclick="psBatalBk(${b.id})">✕ Batal</button>
-          </div>`
-        :`<div class="ps-rab">
-            <button class="ps-rb2 ps-rb-p" title="Cetak resit" onclick="psPrintResit(${b.id})">🖨 Resit</button>
-            <button class="ps-rb2 ps-rb-batal" title="Batalkan rekod" onclick="psBatalBk(${b.id})">✕ Batal</button>
-          </div>`;
+      ?`<span style="font-size:11px;color:var(--t3);font-style:italic">—</span>`
+      :`<button onclick="psOpenActSheet(${b.id})" style="padding:7px 14px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;background:#f9fafb;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--t1)">⋯ Aksi</button>`;
     return`<tr style="${isBatal?'opacity:.5;background:rgba(0,0,0,.02)':''}">
       <td><strong style="color:${isBatal?'var(--t3)':'#007aff'}">#${b.id}</strong></td>
       <td>${st?.name}<br><span style="font-size:10px;color:var(--t3)">${st?.type}</span></td>
@@ -6134,12 +6189,10 @@ function psRList(){
       <td>${acts}</td>
     </tr>`;
   }).join('');
-
   const fp=(k,lbl,cls='')=>`<button class="ps-fp${ps_lFilt.period===k?' on':''}${cls?' '+cls:''}" onclick="psSetLFilt('period','${k}')">${lbl}</button>`;
   const fs=(k,lbl,cls='')=>`<button class="ps-fp${ps_lFilt.status===k?' on'+(cls?' '+cls:''):''}" onclick="psSetLFilt('status','${k}')">${lbl}</button>`;
   const ft=(k,lbl,cls='')=>`<button class="ps-fp${ps_lFilt.type===k?' on'+(cls?' '+cls:''):''}" onclick="psSetLFilt('type','${k}')">${lbl}</button>`;
   const fy=(k,lbl,cls='')=>`<button class="ps-fp${ps_lFilt.payment===k?' on'+(cls?' '+cls:''):''}" onclick="psSetLFilt('payment','${k}')">${lbl}</button>`;
-
   document.getElementById('ps-vList').innerHTML=`
     <div class="ps-card">
       <div class="ps-list-topbar">
@@ -6148,17 +6201,19 @@ function psRList(){
           <div class="ps-list-sub">${fil.length} rekod &nbsp;·&nbsp; 💵 RM${pAmt.cash.toFixed(0)} &nbsp; 📱 RM${pAmt.qr.toFixed(0)} &nbsp; 🏦 RM${pAmt.fpx.toFixed(0)}</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button class="ps-csv-btn" onclick="psExportCSV()">⬇ CSV</button>
-          <button onclick="psHantarKeTransaksi()" style="padding:7px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,#007aff,#0051d5);color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,122,255,.35);white-space:nowrap;transition:all .18s" title="Hantar jumlah sewaan sebagai Income ke tab Transaksi">📤 Kira &amp; Hantar</button>
+          ${isAdmin?`<button class="ps-csv-btn" onclick="psExportCSV()">⬇ CSV</button>`:''}
+          ${isAdmin?`<button onclick="psHantarKeTransaksi()" style="padding:7px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,#007aff,#0051d5);color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,122,255,.35);white-space:nowrap">📤 Kira &amp; Hantar</button>`:''}
         </div>
       </div>
-      <div style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-bottom:1px solid rgba(0,122,255,.12);padding:10px 22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="font-size:11px;font-weight:700;color:#0369a1">💡 <strong>Kira &amp; Hantar</strong> — auto-rekod jumlah sewaan sebagai <em>Income · 🏪 Sewaan Station</em> ke Transaksi. Boleh edit/delete/simpan semula dari tab Transaksi.</span>
-      </div>
-      <div class="ps-filter-row" style="align-items:center">
+      ${isAdmin?`<div style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-bottom:1px solid rgba(0,122,255,.12);padding:10px 22px"><span style="font-size:11px;font-weight:700;color:#0369a1">💡 <strong>Kira &amp; Hantar</strong> — auto-rekod jumlah sewaan sebagai <em>Income · 🏪 Sewaan Station</em> ke Transaksi.</span></div>`:''}
+      <div class="ps-filter-row" style="align-items:center;flex-wrap:wrap;gap:6px">
         <span style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;min-width:62px">TEMPOH:</span>
-        ${fp('today','Hari Ini')} ${fp('semalam','Semalam')} ${fp('week','Minggu')} ${fp('month','Bulan')} ${fp('custom','Custom')}
-        ${ps_lFilt.period==='custom'?`<input type="date" class="ps-fb" value="${ps_lDate}" onchange="ps_lDate=this.value;psRList()" style="margin-left:4px">`: ''}
+        ${fp('today','Hari Ini')} ${fp('semalam','Semalam')} ${fp('week','Minggu')} ${fp('month','Bulan')} ${fp('all','Semua')}
+        <div style="display:flex;align-items:center;gap:6px;margin-left:4px;background:${ps_lFilt.period==='custom'?'rgba(0,122,255,.08)':'rgba(0,0,0,.04)'};border:1.5px solid ${ps_lFilt.period==='custom'?'#007aff':'rgba(0,0,0,.1)'};border-radius:999px;padding:3px 10px 3px 8px;cursor:pointer" onclick="this.querySelector('input').showPicker?.()">
+          <span style="font-size:13px">📅</span>
+          <input type="date" value="${ps_lDate}" onchange="ps_lDate=this.value;ps_lFilt.period='custom';psRList()" style="border:none;background:transparent;font-size:12px;font-weight:700;color:${ps_lFilt.period==='custom'?'#007aff':'var(--t2)'};cursor:pointer;outline:none;width:100px;font-family:inherit">
+          ${ps_lFilt.period==='custom'?`<span style="font-size:11px;font-weight:700;color:#007aff">${psFmtDate(ps_lDate)}</span>`:''}
+        </div>
       </div>
       <div class="ps-filter-row" style="align-items:center">
         <span style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;min-width:62px">STATUS:</span>
@@ -6486,18 +6541,28 @@ function psRPrice(){
 function psSavePrices(){ps_priceEditMode=false;psSaveR();psRPrice();psToast('Harga berjaya disimpan ✅','g');}
 
 // Booking Nav
-const PS_TABS=[{k:'panel',l:'📺 Panel'},{k:'booking',l:'➕ Booking'},{k:'senarai',l:'📋 Senarai'},{k:'analisis',l:'📈 Analisis'},{k:'price',l:'💲 Harga'}];
+const PS_TABS_ALL=[{k:'panel',l:'📺 Panel'},{k:'booking',l:'➕ Booking'},{k:'senarai',l:'📋 Senarai'},{k:'analisis',l:'📈 Analisis'},{k:'price',l:'💲 Harga'}];
+function getPsTabs(){const isAdmin=currentUser?.role==='Admin';return PS_TABS_ALL.filter(t=>t.k!=='price'||isAdmin);}
+const PS_TABS=PS_TABS_ALL;
 const PS_VIDS={panel:'ps-vPanel',booking:'ps-vBook',senarai:'ps-vList',analisis:'ps-vAnal',price:'ps-vPrice'};
-function psRNav(){document.getElementById('ps-hnav').innerHTML=PS_TABS.map(t=>`<button class="ps-ht${ps_av===t.k?' on':''}" onclick="psSv('${t.k}')">${t.l}</button>`).join('');}
+function psRNav(){document.getElementById('ps-hnav').innerHTML=getPsTabs().map(t=>`<button class="ps-ht${ps_av===t.k?' on':''}" onclick="psSv('${t.k}')">${t.l}</button>`).join('');}
 function psSv(v){
+  // Guard: staff cannot access price tab
+  if(v==='price'&&currentUser?.role!=='Admin'){v='panel';}
   ps_av=v;psRNav();
-  PS_TABS.forEach(t=>{const el=document.getElementById(PS_VIDS[t.k]);if(el)el.style.display=t.k===v?'block':'none';});
+  PS_TABS_ALL.forEach(t=>{const el=document.getElementById(PS_VIDS[t.k]);if(el)el.style.display=t.k===v?'block':'none';});
   if(v==='panel')psRPanel();
   if(v==='booking'){ps_bF=psNb();psRBook();}
   if(v==='senarai')psRList();
   if(v==='analisis')psRAnalFull();
   if(v==='price')psRPrice();
   psUpdStats();
+  // Sync mobile bottom nav — hide Harga for staff
+  const isAdmin=currentUser?.role==='Admin';
+  document.querySelectorAll('.ps-mnt[data-psv]').forEach(b=>{
+    b.classList.toggle('on',b.dataset.psv===v);
+    if(b.dataset.psv==='price')b.style.display=isAdmin?'':'none';
+  });
 }
 function psUpdStats(){
   const now=Date.now();const act=ps_bks.filter(b=>b.status==='a'&&new Date(b.et)>now).length;
@@ -6585,6 +6650,7 @@ function psInitOverlayTab(){
 // ================================================================
 function renderPsBooking(){
   const el=document.getElementById('root');
+  const isAdmin=currentUser?.role==='Admin';
   el.innerHTML=`
     <div class="ps-wrap">
       <div id="ps-toast" class="ps-toast-mod"></div>
@@ -6595,6 +6661,17 @@ function renderPsBooking(){
           <div class="ps-mbtns"><button class="ps-mb ps-mb-c" onclick="psCloseModal()">Batal</button><button class="ps-mb ps-mb-ok" id="ps-mOk">Sahkan</button></div>
         </div>
       </div>
+      <!-- Action Sheet -->
+      <div class="ps-act-sheet" id="psActSheet" onclick="psCloseActSheet(event)">
+        <div class="ps-act-box" id="psActBox">
+          <div class="ps-act-handle"></div>
+          <div class="ps-act-title" id="psActTitle"></div>
+          <div class="ps-act-sub" id="psActSub"></div>
+          <div class="ps-act-btns" id="psActBtns"></div>
+          <button class="ps-act-cancel-btn" onclick="psCloseActSheet()">Tutup</button>
+        </div>
+      </div>
+      <!-- Header -->
       <div class="ps-hdr">
         <div class="ps-hb"><div class="ico">🎮</div><div class="nm">PS Booking</div></div>
         <nav class="ps-hnav" id="ps-hnav"></nav>
@@ -6604,6 +6681,7 @@ function renderPsBooking(){
           <div class="ps-hclk" id="ps-hClk">--:--:--</div>
         </div>
       </div>
+      <!-- Content -->
       <div class="ps-body">
         <div id="ps-vPanel"></div>
         <div id="ps-vBook" style="display:none"></div>
@@ -6611,10 +6689,61 @@ function renderPsBooking(){
         <div id="ps-vAnal" style="display:none"></div>
         <div id="ps-vPrice" style="display:none"></div>
       </div>
+      <!-- Mobile Bottom Nav -->
+      <div class="ps-mob-nav">
+        <div class="ps-mob-nav-inner">
+          <button class="ps-mnt on" data-psv="panel" onclick="psSv('panel')"><span class="ps-mnt-ico">📺</span><span class="ps-mnt-lbl">Panel</span></button>
+          <button class="ps-mnt" data-psv="booking" onclick="psSv('booking')"><span class="ps-mnt-ico">➕</span><span class="ps-mnt-lbl">Booking</span></button>
+          <button class="ps-mnt" data-psv="senarai" onclick="psSv('senarai')"><span class="ps-mnt-ico">📋</span><span class="ps-mnt-lbl">Senarai</span></button>
+          <button class="ps-mnt" data-psv="analisis" onclick="psSv('analisis')"><span class="ps-mnt-ico">📈</span><span class="ps-mnt-lbl">Analisis</span></button>
+          <button class="ps-mnt" data-psv="price" onclick="psSv('price')"><span class="ps-mnt-ico">💲</span><span class="ps-mnt-lbl">Harga</span></button>
+        </div>
+      </div>
     </div>
   `;
   psLoad();psRNav();psSv('panel');psStartTimer();
 }
+
+// Update psSv to also sync mobile nav
+const _psOrigSv = null;
+function psMobNavSync(v){
+  document.querySelectorAll('.ps-mnt[data-psv]').forEach(b=>{
+    b.classList.toggle('on', b.dataset.psv===v);
+  });
+}
+
+// Action Sheet functions
+function psCloseActSheet(e){
+  if(e&&e.target!==document.getElementById('psActSheet'))return;
+  document.getElementById('psActSheet')?.classList.remove('show');
+}
+
+function psOpenActSheet(bkId){
+  const b=ps_bks.find(b=>b.id===bkId);if(!b)return;
+  const st=PS_STATIONS.find(s=>s.id===b.sid);
+  const isAktif=b.status==='a';const isBatal=b.status==='x';
+  const isAdmin=currentUser?.role==='Admin';
+  const rem=psGetRemMs(b);
+  const payIco={'cash':'💵','qr':'📱','fpx':'🏦'}[b.payment||'cash']||'';
+  document.getElementById('psActTitle').textContent=`${st?.name||'Station'} (${st?.type})`;
+  document.getElementById('psActSub').innerHTML=`#${b.id} · ${b.players} Player ${payIco} · ${b.dur}j · <strong style="color:#007aff">RM ${b.amt.toFixed(2)}</strong>${isAktif&&rem>0?`<br><span style="font-family:monospace;font-weight:800;color:#34c759">⏱ ${psFmtCd(rem)}</span>`:''}`;
+  let btns='';
+  if(isBatal){
+    btns=`<div style="text-align:center;padding:12px;color:var(--t3);font-size:13px">Booking ini telah dibatalkan</div>`;
+  }else if(isAktif){
+    btns+=`<button class="ps-act-btn ab-tamat" onclick="psCloseActSheet();psEndFromList(${b.id})"><div class="ps-act-btn-icon">⏹</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">Tamat Sesi</div><div class="ps-act-btn-desc">Selesaikan dan kutip bayaran</div></div></button>`;
+    btns+=`<button class="ps-act-btn ab-1h" onclick="psCloseActSheet();psAdd1h(${b.id})"><div class="ps-act-btn-icon">⏰</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">+1 Jam</div><div class="ps-act-btn-desc">Lanjutkan tempoh 1 jam lagi</div></div></button>`;
+    btns+=`<button class="ps-act-btn ab-joy" onclick="psCloseActSheet();psAddJoy(${b.id})"><div class="ps-act-btn-icon">🕹️</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">+Joystik</div><div class="ps-act-btn-desc">Tambah controller ekstra</div></div></button>`;
+    btns+=`<button class="ps-act-btn ab-print" onclick="psCloseActSheet();psPrintResit(${b.id})"><div class="ps-act-btn-icon">🖨️</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">Cetak Resit</div><div class="ps-act-btn-desc">Cetak resit untuk pelanggan</div></div></button>`;
+    if(isAdmin) btns+=`<button class="ps-act-btn ab-batal" onclick="psCloseActSheet();psBatalBk(${b.id})"><div class="ps-act-btn-icon">✕</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">Batalkan Booking</div><div class="ps-act-btn-desc">Hanya Admin — amaun tidak dikira</div></div></button>`;
+  }else{
+    btns+=`<button class="ps-act-btn ab-selesai-print" onclick="psCloseActSheet();psPrintResit(${b.id})"><div class="ps-act-btn-icon">🖨️</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">Cetak Resit</div><div class="ps-act-btn-desc">Cetak resit sesi yang telah selesai</div></div></button>`;
+    if(isAdmin) btns+=`<button class="ps-act-btn ab-batal" onclick="psCloseActSheet();psBatalBk(${b.id})"><div class="ps-act-btn-icon">✕</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">Batalkan Rekod</div><div class="ps-act-btn-desc">Hanya Admin — buang dari jumlah</div></div></button>`;
+  }
+  document.getElementById('psActBtns').innerHTML=btns;
+  document.getElementById('psActSheet').classList.add('show');
+}
+
 
 function renderPsOverlay(){
   const el=document.getElementById('root');
