@@ -1643,10 +1643,14 @@ textarea.m-input{border-radius:14px;resize:vertical}
     position:absolute;top:12px;right:10px;
     width:26px;height:26px;border:none;border-radius:8px;
     background:rgba(91,91,214,.1);color:var(--p);
-    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;display:none;align-items:center;justify-content:center;
     font-size:13px;transition:all .2s;z-index:10;flex-shrink:0
   }
   #sidebarToggleBtn:hover{background:rgba(91,91,214,.2)}
+  /* Sidebar toggle button — desktop only */
+  #sidebarToggleBtn{
+    display:flex !important;
+  }
   .bottom-nav.sidebar-collapsed #sidebarToggleBtn{
     right:auto;left:50%;transform:translateX(-50%);top:12px;
   }
@@ -1725,7 +1729,7 @@ textarea.m-input{border-radius:14px;resize:vertical}
 
 <div class="app">
   <div class="content" id="root"></div>
-  <div class="bottom-nav" id="glassNav" style="position:sticky">
+  <div class="bottom-nav" id="glassNav">
     <!-- Liquid Glass Layers -->
     <div class="glass-filter"></div>
     <div class="glass-overlay"></div>
@@ -7185,24 +7189,33 @@ function applyTabVisibility() {
   document.querySelectorAll('.tab[data-tab]').forEach(t => {
     const tab = t.dataset.tab;
     if (!tab || tab === '_more') return;
-    // Always show Home, Transaksi, Lagi
-    if (tab === 'home' || tab === 'calendar') return;
 
-    // Check if it's a desktop-only tab (skip on mobile)
     const isDesktopOnly = t.classList.contains('desk-only');
     const isMobOnly = t.classList.contains('mob-only');
+    const isAlways = !isDesktopOnly && !isMobOnly; // no class = show everywhere
 
-    const hasPermission = perms.includes(tab);
+    // Core tabs always visible regardless of permissions
+    const isCoreTab = tab === 'home' || tab === 'calendar';
+
+    const hasPermission = isCoreTab || perms.includes(tab);
 
     if (!hasPermission) {
-      // Hide tab regardless of device
       t.style.setProperty('display', 'none', 'important');
-    } else {
-      // Restore proper display
+      return;
+    }
+
+    // Restore correct display based on device + class
+    if (isMobile) {
       if (isDesktopOnly) {
-        t.style.setProperty('display', isMobile ? 'none' : 'flex', 'important');
-      } else if (isMobOnly) {
-        t.style.setProperty('display', isMobile ? 'flex' : 'none', 'important');
+        t.style.setProperty('display', 'none', 'important');
+      } else {
+        // mob-only or no-class: show on mobile
+        t.style.removeProperty('display');
+      }
+    } else {
+      // Desktop
+      if (isMobOnly) {
+        t.style.setProperty('display', 'none', 'important');
       } else {
         t.style.removeProperty('display');
       }
