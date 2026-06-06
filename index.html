@@ -5905,10 +5905,25 @@ function psRPanel(){
     const b=psGetAB(s.id,ps_pDate);const rem=b?psGetRemMs(b):0;
     let cls='',badge='',tCls='ps-ty',tTxt='--:--:--',btns='';
     if(b){
-      if(b.status==='s'){cls='';badge=`<span class="ps-sbg ps-bg-k">Selesai</span>`;btns=`<div class="ps-scb"><button class="ps-bx ps-bk" onclick="psQBook(${s.id})">+ Booking</button></div>`;}
-      else if(isT&&rem>0){cls='aktif';badge=`<span class="ps-sbg ps-bg-a">Aktif</span>`;tCls='ps-tg';tTxt=psFmtCd(rem);const joyLbl=s.type==='PS5'?'+DS5 (RM8)':'+DS4 (RM5)';btns=`<div class="ps-scb"><button class="ps-bx ps-bj" onclick="psAddJoyPanel(${b.id})">${joyLbl}</button><button class="ps-bx ps-be" onclick="psEndBk(${b.id})">Tamat</button></div>`;}
-      else if(isT&&rem<=0&&b.status==='a'){cls='tamat';badge=`<span class="ps-sbg ps-bg-t">TAMAT!</span>`;tCls='ps-tr';tTxt='00:00:00';btns=`<div class="ps-scb"><button class="ps-bx ps-be" style="font-size:12px" onclick="psEndBk(${b.id})">✅ Selesai &amp; Bayar</button></div>`;}
-      else{cls='aktif';badge=`<span class="ps-sbg ps-bg-a">Booking</span>`;btns=`<div class="ps-scb"><button class="ps-bx ps-be" onclick="psEndBk(${b.id})">Tamat</button></div>`;}
+      if(b.status==='s'){
+        cls='';badge=`<span class="ps-sbg ps-bg-k">Selesai</span>`;
+        btns=`<div class="ps-scb"><button class="ps-bx ps-bk" onclick="psQBook(${s.id})">+ Booking</button></div>`;
+      }else if(isT&&rem>0){
+        cls='aktif';badge=`<span class="ps-sbg ps-bg-a">Aktif</span>`;tCls='ps-tg';tTxt=psFmtCd(rem);
+        btns=`<div class="ps-scb">
+          <button class="ps-bx" style="background:rgba(175,82,222,.12);color:#7c3aed;border:1px solid rgba(175,82,222,.2);font-size:12px;flex:1" onclick="psPanelAdd1h(${b.id})">⏰ +1 Jam</button>
+          <button class="ps-bx ps-be" style="font-size:12px;flex:1" onclick="psPanelTamat(${b.id})">⏹ Tamat</button>
+        </div>`;
+      }else if(isT&&rem<=0&&b.status==='a'){
+        cls='tamat';badge=`<span class="ps-sbg ps-bg-t">TAMAT!</span>`;tCls='ps-tr';tTxt='00:00:00';
+        btns=`<div class="ps-scb"><button class="ps-bx ps-be" style="font-size:11px" onclick="psPanelTamat(${b.id})">✅ Selesai &amp; Bayar</button></div>`;
+      }else{
+        cls='aktif';badge=`<span class="ps-sbg ps-bg-a">Booking</span>`;
+        btns=`<div class="ps-scb">
+          <button class="ps-bx" style="background:rgba(175,82,222,.12);color:#7c3aed;border:1px solid rgba(175,82,222,.2);font-size:12px;flex:1" onclick="psPanelAdd1h(${b.id})">⏰ +1 Jam</button>
+          <button class="ps-bx ps-be" style="font-size:12px;flex:1" onclick="psPanelTamat(${b.id})">⏹ Tamat</button>
+        </div>`;
+      }
     }else{badge=`<span class="ps-sbg ps-bg-k">Kosong</span>`;btns=`<div class="ps-scb"><button class="ps-bx ps-bk" onclick="psQBook(${s.id})">+ Booking</button></div>`;}
     const xs=[b?.xDS4&&'DS4',b?.xDS5&&'DS5'].filter(Boolean).join('+');
     const payBadge=b?({'cash':'💵','qr':'📱','fpx':'🏦'}[b.payment]||''):'';
@@ -5917,10 +5932,61 @@ function psRPanel(){
   document.getElementById('ps-vPanel').innerHTML=`<div class="ps-card"><div class="ps-ch"><div class="ps-ct">📺 Panel Station</div><div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;font-weight:700;color:var(--t2)">Tarikh:</span><input type="date" class="ps-fb" value="${ps_pDate}" onchange="ps_pDate=this.value;psRPanel()"><span style="font-size:12px;color:var(--t2);font-weight:600">${psFmtDate(ps_pDate)}</span></div></div><div class="ps-strip"><div class="ps-si"><div class="ps-sv" style="color:#34c759">${act}</div><div class="ps-sl">Aktif</div></div><div class="ps-si"><div class="ps-sv">${fb.length}</div><div class="ps-sl">Booking</div></div><div class="ps-si"><div class="ps-sv" style="color:#007aff">RM ${tot.toFixed(2)}</div><div class="ps-sl">Hasil</div></div><div class="ps-si"><div class="ps-sv">${ps5}</div><div class="ps-sl">PS5 Bk</div></div><div class="ps-si"><div class="ps-sv">${ps4}</div><div class="ps-sl">PS4 Bk</div></div></div><div class="ps-sgrid">${cards}</div><div style="padding:0 22px 12px;font-size:11px;color:var(--t3)">⏱ Timer auto-kemas setiap saat · 🔊 Alert suara 5 minit sebelum tamat &amp; masa tamat · Masa Malaysia GMT+8</div></div>`;
 }
 function psQBook(sid){ps_bF=psNb();ps_bF.sid=sid;psSv('booking');}
-function psEndBk(id){
+
+function psPanelAdd1h(id){
   const b=ps_bks.find(b=>b.id===id);if(!b)return;
   const st=PS_STATIONS.find(s=>s.id===b.sid);
-  psConfirm2('Tamat Sesi',`<strong>${st?.name} (${st?.type})</strong><br>Jenis: ${b.players}P · ${b.payment?.toUpperCase()}<br>Jumlah: <strong style="color:#007aff">RM ${b.amt.toFixed(2)}</strong><br><br>Sila kutip bayaran terlebih dahulu.`,'ps-mb-d',()=>{b.status='s';psSave();psRPanel();if(ps_av==='senarai')psRList();psToast(`✅ St${b.sid} selesai · RM ${b.amt.toFixed(2)}`,'g');});
+  const type=st?.type||'PS5';
+  const players=b.players||1;
+  const oldDur=b.dur||1;
+  const newDur=oldDur+1;
+  const oldAmt=b.amt;
+  // Calculate new amount using package pricing
+  const xtra=psCalcX(b);
+  let newBase;
+  if(newDur<=3){
+    newBase=b.loyalty?0:(PS_RATES[type]?.[players]?.[newDur]||0);
+  }else{
+    const base3=b.loyalty?0:(PS_RATES[type]?.[players]?.[3]||0);
+    const rate1=PS_RATES[type]?.[players]?.[1]||0;
+    newBase=base3+((newDur-3)*rate1);
+  }
+  const newAmt=newBase+xtra;
+  const diff=newAmt-oldAmt;
+
+  psConfirm2(
+    '⏰ Tambah 1 Jam',
+    `<strong>${st?.name} (${type})</strong><br>
+    ${players} Player · Dari ${oldDur}j → <strong>${newDur}j</strong><br><br>
+    Harga semasa: <span style="text-decoration:line-through;color:#9ca3af">RM ${oldAmt.toFixed(2)}</span><br>
+    Harga baru: <strong style="color:#007aff;font-size:16px">RM ${newAmt.toFixed(2)}</strong><br>
+    <small style="color:#6b7280">${newDur<=3?`Pakej ${newDur}j digunakan`:`Pakej 3j + tambahan ${newDur-3}j`}${diff>0?` · Tambah RM${diff.toFixed(2)}`:' · Jimat dengan pakej!'}</small>`,
+    'ps-mb-ok',
+    ()=>{
+      psAdd1h(id);
+      psRPanel();
+    }
+  );
+}
+
+function psPanelTamat(id){
+  const b=ps_bks.find(b=>b.id===id);if(!b)return;
+  const st=PS_STATIONS.find(s=>s.id===b.sid);
+  psConfirm2(
+    '⏹ Tamat Sesi',
+    `<strong>${st?.name} (${st?.type})</strong><br>
+    ${b.players}P · ${b.dur}j · ${(b.payment||'cash').toUpperCase()}<br>
+    Jumlah: <strong style="color:#007aff;font-size:16px">RM ${b.amt.toFixed(2)}</strong><br><br>
+    Sila kutip bayaran terlebih dahulu.`,
+    'ps-mb-d',
+    ()=>{
+      b.status='s';
+      psSave();
+      psRPanel();
+      if(ps_av==='senarai')psRList();
+      psToast(`✅ ${st?.name} selesai · RM ${b.amt.toFixed(2)}`,'g');
+    }
+  );
 }
 function psAddJoyPanel(id){
   const b=ps_bks.find(b=>b.id===id);if(!b)return;
@@ -6169,7 +6235,49 @@ function psRList(){
 }
 
 function psEndFromList(id){const b=ps_bks.find(b=>b.id===id);if(!b)return;b.status='s';psSave();psRList();psToast(`✅ Sesi #${id} selesai`,'g');}
-function psAdd1h(id){const b=ps_bks.find(b=>b.id===id);if(!b)return;b.et=new Date(new Date(b.et).getTime()+3600000).toISOString();b.dur=(b.dur||1)+1;b.amt+=PS_RATES[PS_STATIONS.find(s=>s.id===b.sid)?.type||'PS5']?.[b.players]?.[1]||0;psSave();psRList();psToast('+1 jam ditambah','g');}
+function psAdd1h(id){
+  const b=ps_bks.find(b=>b.id===id);if(!b)return;
+  const st=PS_STATIONS.find(s=>s.id===b.sid);
+  const type=st?.type||'PS5';
+  const players=b.players||1;
+  const oldDur=b.dur||1;
+  const newDur=oldDur+1;
+
+  // Calculate OLD base price (before extension)
+  const oldBase=psCalcBase(b.sid,players,oldDur,b.loyalty,b.st);
+  // Calculate NEW base price with new duration
+  // If new duration > 3 (max pakej), tambah harga 1 jam biasa
+  let newBase;
+  if(newDur<=3){
+    // Use package rate — newDur jam
+    newBase=b.loyalty?0:(PS_RATES[type]?.[players]?.[newDur]||0);
+  }else{
+    // Beyond 3 jam — add 1 jam rate on top of 3-jam package
+    const base3=b.loyalty?0:(PS_RATES[type]?.[players]?.[3]||0);
+    const rate1=PS_RATES[type]?.[players]?.[1]||0;
+    newBase=base3+((newDur-3)*rate1);
+  }
+
+  // Extras (DS4/DS5) remain same
+  const xtra=psCalcX(b);
+  const newAmt=newBase+xtra;
+
+  b.et=new Date(new Date(b.et).getTime()+3600000).toISOString();
+  b.dur=newDur;
+  b.amt=newAmt;
+
+  psSave();
+
+  // Show what changed
+  const diff=newAmt-(oldBase+xtra);
+  const msg=newDur<=3
+    ?`✅ +1j → ${newDur}j | RM${(oldBase+xtra).toFixed(2)} → RM${newAmt.toFixed(2)} (pakej ${newDur}j)`
+    :`✅ +1j → ${newDur}j | +RM${diff.toFixed(2)} (kadar 1j)`;
+  psToast(msg,'g');
+
+  if(ps_av==='senarai')psRList();
+  else if(ps_av==='panel')psRPanel();
+}
 function psAddJoy(id){const b=ps_bks.find(b=>b.id===id);if(!b)return;const st=PS_STATIONS.find(s=>s.id===b.sid);const price=PS_JOY_PRICE[st?.type]||5;b.amt+=price;psSave();psRList();psToast(`Joy ditambah · +RM${price}`,'g');}
 function psBatalBk(id){
   const b=ps_bks.find(b=>b.id===id);if(!b)return;
@@ -6667,7 +6775,6 @@ function psOpenActSheet(bkId){
   }else if(isAktif){
     btns+=`<button class="ps-act-btn ab-tamat" onclick="psCloseActSheet();psEndFromList(${b.id})"><div class="ps-act-btn-icon">⏹</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">Tamat Sesi</div><div class="ps-act-btn-desc">Selesaikan dan kutip bayaran</div></div></button>`;
     btns+=`<button class="ps-act-btn ab-1h" onclick="psCloseActSheet();psAdd1h(${b.id})"><div class="ps-act-btn-icon">⏰</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">+1 Jam</div><div class="ps-act-btn-desc">Lanjutkan tempoh 1 jam lagi</div></div></button>`;
-    btns+=`<button class="ps-act-btn ab-joy" onclick="psCloseActSheet();psAddJoy(${b.id})"><div class="ps-act-btn-icon">🕹️</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">+Joystik</div><div class="ps-act-btn-desc">Tambah controller ekstra</div></div></button>`;
     btns+=`<button class="ps-act-btn ab-print" onclick="psCloseActSheet();psPrintResit(${b.id})"><div class="ps-act-btn-icon">🖨️</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">Cetak Resit</div><div class="ps-act-btn-desc">Cetak resit untuk pelanggan</div></div></button>`;
     if(isAdmin) btns+=`<button class="ps-act-btn ab-batal" onclick="psCloseActSheet();psBatalBk(${b.id})"><div class="ps-act-btn-icon">✕</div><div class="ps-act-btn-text"><div class="ps-act-btn-name">Batalkan Booking</div><div class="ps-act-btn-desc">Hanya Admin — amaun tidak dikira</div></div></button>`;
   }else{
