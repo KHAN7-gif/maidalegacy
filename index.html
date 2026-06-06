@@ -1682,9 +1682,37 @@ textarea.m-input{border-radius:14px;resize:vertical}
   .cat-grid{grid-template-columns:repeat(7,1fr)}
   .bars{height:220px}
 }
+/* ===================== ACHIEVEMENT ===================== */
+.ach-hero{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);padding:28px 16px 20px;text-align:center;position:relative;overflow:hidden}
+.ach-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,215,0,.18),transparent 70%)}
+.ach-hero-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px;position:relative}
+.ach-hero-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px;position:relative}
+.ach-hero-stats{display:flex;justify-content:center;gap:24px;margin-top:16px;position:relative}
+.ach-hero-stat-val{font-size:22px;font-weight:900;color:#fbbf24}
+.ach-hero-stat-lbl{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.ach-section-title{font-size:12px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px;padding:14px 12px 0}
+.ach-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:4px 12px 16px}
+@media(min-width:600px){.ach-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.ach-grid{grid-template-columns:repeat(4,1fr)}}
+.ach-card{background:var(--card);border-radius:18px;padding:16px 12px;border:2px solid var(--border);box-shadow:var(--sh-sm);text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.ach-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.ach-card.unlocked{border-color:transparent}
+.ach-star{font-size:38px;line-height:1;margin-bottom:8px;transition:all .4s;display:block}
+.ach-card:not(.unlocked) .ach-star{filter:grayscale(1) opacity(.3)}
+.ach-card.unlocked .ach-star{animation:ach-pop .5s ease}
+@keyframes ach-pop{0%{transform:scale(.6)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.ach-name{font-size:12px;font-weight:800;color:var(--t1);line-height:1.3;margin-bottom:3px}
+.ach-card:not(.unlocked) .ach-name,.ach-card:not(.unlocked) .ach-target{color:var(--t3)}
+.ach-target{font-size:11px;font-weight:700;color:var(--t2)}
+.ach-progress{margin-top:8px;height:4px;background:rgba(0,0,0,.07);border-radius:2px;overflow:hidden}
+.ach-progress-bar{height:100%;border-radius:2px;transition:width .8s ease}
+.ach-date{font-size:9px;color:var(--t3);margin-top:5px;font-weight:600}
+.ach-badge-new{position:absolute;top:8px;right:8px;font-size:9px;font-weight:900;padding:2px 7px;border-radius:999px;background:#ef4444;color:#fff;letter-spacing:.3px}
+#fw-canvas{position:fixed;inset:0;pointer-events:none;z-index:9998;display:none}
 </style>
 </head>
 <body>
+<canvas id="fw-canvas"></canvas>
 <!-- SVG Filter for Liquid Glass Distortion -->
 <svg style="display:none;position:absolute;width:0;height:0" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -1774,6 +1802,10 @@ textarea.m-input{border-radius:14px;resize:vertical}
       <div class="tab desk-only" data-tab="ps_overlay">
         <div class="tab-ic"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-linecap="round"/><circle cx="12" cy="10" r="2" stroke="currentColor"/></svg></div>
         <span>PS Overlay</span>
+      </div>
+      <div class="tab desk-only" data-tab="achievement">
+        <div class="tab-ic"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor"/></svg></div>
+        <span>Pencapaian</span>
       </div>
       <div class="nav-sep desk-only"></div>
       <div class="tab desk-only" data-tab="settings">
@@ -4257,6 +4289,7 @@ function buildHomeMenu() {
     { tab:'syer',       icon:'💰', label:'Pembahagian Syer',     cls:'ci-bl',  sub:'', bg:'background:linear-gradient(135deg,#eff6ff,#fff)' },
     { tab:'ps_booking', icon:'🎮', label:'PS Booking',           cls:'',       sub:'Panel station · Booking · Harga', bg:'background:linear-gradient(135deg,#f0f9ff,#fff)', icoStyle:'background:#e0f0ff' },
     { tab:'ps_overlay', icon:'📺', label:'PS Overlay',           cls:'',       sub:'Preview OBS langsung real-time', bg:'background:linear-gradient(135deg,#fdf0ff,#fff)', icoStyle:'background:#f0e0ff' },
+    { tab:'achievement',icon:'🏆', label:'Pencapaian',           cls:'',       sub:'Rekod & reward pendapatan', bg:'background:linear-gradient(135deg,#fffbeb,#fff)', icoStyle:'background:#fef3c7' },
     { tab:'settings',   icon:'⚙️', label:'Tetapan & Data',      cls:'ci-te',  sub:'' },
   ];
 
@@ -4705,6 +4738,7 @@ function render() {
   else if(activeTab==='analytic')  { root.innerHTML=renderAnalytic(); attachAnlEvents(); }
   else if(activeTab==='dokumen')     root.innerHTML=renderDocuments();
   else if(activeTab==='settings')    root.innerHTML=renderSettings();
+  else if(activeTab==='achievement') root.innerHTML=renderAchievement();
   else if(activeTab==='pelanggan')   root.innerHTML=renderClients();
   else if(activeTab==='stok')        root.innerHTML=renderStock();
   else if(activeTab==='staff')       root.innerHTML=renderStaff();
@@ -5985,6 +6019,8 @@ function psPanelTamat(id){
       psRPanel();
       if(ps_av==='senarai')psRList();
       psToast(`✅ ${st?.name} selesai · RM ${b.amt.toFixed(2)}`,'g');
+      // Check achievement after session ends
+      setTimeout(()=>achCheckAndFirework(), 600);
     }
   );
 }
@@ -6152,6 +6188,7 @@ function psSyncToTransaksi(tarikh,tot,count,periodeLabel){
     saveAll();
     psToast(`✅ Dihantar ke Transaksi: RM ${tot.toFixed(2)}`,'g');
   }
+  setTimeout(()=>achCheckAndFirework(), 800);
   // Switch to calendar tab to show the result
   setTimeout(()=>{
     switchTab('calendar');
@@ -6920,6 +6957,7 @@ const ALL_MODULES = [
   { key:'syer',       icon:'💰', label:'Pembahagian Syer',       desc:'Pengiraan & pembahagian syer' },
   { key:'ps_booking', icon:'🎮', label:'PS Booking',             desc:'Panel station, booking, harga' },
   { key:'ps_overlay', icon:'📺', label:'PS Overlay',             desc:'Preview OBS live streaming' },
+  { key:'achievement',icon:'🏆', label:'Pencapaian',             desc:'Rekod & reward pendapatan' },
   { key:'settings',   icon:'⚙️', label:'Tetapan & Data',        desc:'Pengurusan sistem & eksport' },
 ];
 
@@ -7294,6 +7332,214 @@ function applyTabVisibility() {
 // ================================================================
 //  INIT
 // ================================================================
+
+// ================================================================
+//  ACHIEVEMENT SYSTEM
+// ================================================================
+const ACH_STORAGE_KEY = 'mde_achievements_v1';
+let achUnlocked = {}; // { id: { unlockedAt, notified } }
+
+function achLoad(){
+  try{ const d=localStorage.getItem(ACH_STORAGE_KEY); if(d) achUnlocked=JSON.parse(d); }catch(e){}
+}
+function achSave(){ localStorage.setItem(ACH_STORAGE_KEY, JSON.stringify(achUnlocked)); }
+
+// Achievement definitions
+const ACH_DEFS = [
+  // Daily income milestones
+  { id:'d50',   cat:'harian', name:'Pendapatan Harian RM50',   target:50,   type:'daily',   star:'⭐', color:'#94a3b8', glow:'#cbd5e1' },
+  { id:'d100',  cat:'harian', name:'Pendapatan Harian RM100',  target:100,  type:'daily',   star:'⭐', color:'#fb923c', glow:'#fed7aa' },
+  { id:'d200',  cat:'harian', name:'Pendapatan Harian RM200',  target:200,  type:'daily',   star:'🌟', color:'#facc15', glow:'#fef08a' },
+  { id:'d300',  cat:'harian', name:'Pendapatan Harian RM300',  target:300,  type:'daily',   star:'🌟', color:'#4ade80', glow:'#bbf7d0' },
+  { id:'d500',  cat:'harian', name:'Pendapatan Harian RM500',  target:500,  type:'daily',   star:'💫', color:'#60a5fa', glow:'#bfdbfe' },
+  { id:'d600',  cat:'harian', name:'Pendapatan Harian RM600',  target:600,  type:'daily',   star:'💫', color:'#a78bfa', glow:'#ddd6fe' },
+  { id:'d1000', cat:'harian', name:'Pendapatan Harian RM1000', target:1000, type:'daily',   star:'🏆', color:'#f59e0b', glow:'#fde68a' },
+  // Weekly
+  { id:'wbest', cat:'mingguan', name:'Pendapatan Tertinggi Mingguan', target:0, type:'weekly_best', star:'🥇', color:'#f59e0b', glow:'#fde68a' },
+  // Monthly
+  { id:'mbest', cat:'bulanan',  name:'Pendapatan Tertinggi Bulanan',  target:0, type:'monthly_best', star:'👑', color:'#d4006b', glow:'#fbcfe8' },
+];
+
+function achGetDailyTotal(dateStr){
+  return tx.filter(t=>t.type==='income'&&t.date===dateStr).reduce((s,t)=>s+(t.amount||0),0);
+}
+function achGetWeekTotal(weekStr){ // weekStr = YYYY-WW
+  return tx.filter(t=>t.type==='income'&&t.date&&achGetWeekKey(t.date)===weekStr).reduce((s,t)=>s+(t.amount||0),0);
+}
+function achGetWeekKey(dateStr){
+  const d=new Date(dateStr+' 12:00');
+  const jan1=new Date(d.getFullYear(),0,1);
+  const week=Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);
+  return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
+}
+function achGetMonthTotal(monthStr){ // YYYY-MM
+  return tx.filter(t=>t.type==='income'&&t.date&&t.date.startsWith(monthStr)).reduce((s,t)=>s+(t.amount||0),0);
+}
+
+function achCheckAll(){
+  achLoad();
+  const now=new Date();
+  const todStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const weekStr=achGetWeekKey(todStr);
+  const monStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  const todayInc=achGetDailyTotal(todStr);
+  const weekInc=achGetWeekTotal(weekStr);
+  const monInc=achGetMonthTotal(monStr);
+
+  // Find best week & month ever
+  const allWeeks={}, allMonths={};
+  tx.filter(t=>t.type==='income'&&t.date).forEach(t=>{
+    const wk=achGetWeekKey(t.date); allWeeks[wk]=(allWeeks[wk]||0)+(t.amount||0);
+    const mn=t.date.slice(0,7); allMonths[mn]=(allMonths[mn]||0)+(t.amount||0);
+  });
+  const bestWeek=Math.max(0,...Object.values(allWeeks));
+  const bestMonth=Math.max(0,...Object.values(allMonths));
+
+  let newlyUnlocked=[];
+  ACH_DEFS.forEach(a=>{
+    if(achUnlocked[a.id]) return; // already got it
+    let achieved=false;
+    if(a.type==='daily')        achieved=todayInc>=a.target;
+    if(a.type==='weekly_best')  achieved=weekInc>0&&weekInc>=bestWeek&&weekInc>0;
+    if(a.type==='monthly_best') achieved=monInc>0&&monInc>=bestMonth&&monInc>0;
+    if(achieved){
+      achUnlocked[a.id]={ unlockedAt:new Date().toISOString(), value: a.type==='daily'?todayInc:a.type==='weekly_best'?weekInc:monInc };
+      newlyUnlocked.push(a);
+    }
+  });
+  if(newlyUnlocked.length) achSave();
+  return newlyUnlocked;
+}
+
+function achTriggerFirework(){
+  const canvas=document.getElementById('fw-canvas');
+  if(!canvas) return;
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  canvas.style.display='block';
+  const ctx=canvas.getContext('2d');
+  const particles=[];
+  const colors=['#fbbf24','#f59e0b','#ef4444','#8b5cf6','#3b82f6','#10b981','#ec4899','#ffffff'];
+
+  for(let b=0;b<8;b++){
+    const x=Math.random()*canvas.width;
+    const y=Math.random()*canvas.height*0.6;
+    for(let i=0;i<60;i++){
+      const angle=Math.random()*Math.PI*2;
+      const speed=2+Math.random()*6;
+      particles.push({ x,y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed-3, alpha:1, color:colors[Math.floor(Math.random()*colors.length)], size:2+Math.random()*3, gravity:.12 });
+    }
+  }
+
+  let frame=0;
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy+=p.gravity; p.alpha-=.012; p.vx*=.99;
+      if(p.alpha<=0) return;
+      ctx.globalAlpha=p.alpha;
+      ctx.fillStyle=p.color;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha=1;
+    frame++;
+    if(frame<200) requestAnimationFrame(animate);
+    else{ canvas.style.display='none'; ctx.clearRect(0,0,canvas.width,canvas.height); }
+  }
+  animate();
+}
+
+function achCheckAndFirework(){
+  const newly=achCheckAll();
+  if(newly.length>0){
+    achTriggerFirework();
+    newly.forEach((a,i)=>{ setTimeout(()=>{ psToast(`🏆 Pencapaian Baru: ${a.name} ${a.star}`,'g'); },i*800); });
+  }
+}
+
+function renderAchievement(){
+  achLoad();
+  const now=new Date();
+  const todStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const weekStr=achGetWeekKey(todStr);
+  const monStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const todayInc=achGetDailyTotal(todStr);
+  const weekInc=achGetWeekTotal(weekStr);
+  const monInc=achGetMonthTotal(monStr);
+  const allWeeks={}, allMonths={};
+  tx.filter(t=>t.type==='income'&&t.date).forEach(t=>{
+    const wk=achGetWeekKey(t.date); allWeeks[wk]=(allWeeks[wk]||0)+(t.amount||0);
+    const mn=t.date.slice(0,7); allMonths[mn]=(allMonths[mn]||0)+(t.amount||0);
+  });
+  const bestWeek=Math.max(0,...Object.values(allWeeks));
+  const bestMonth=Math.max(0,...Object.values(allMonths));
+
+  const totalUnlocked=Object.keys(achUnlocked).length;
+  const total=ACH_DEFS.length;
+
+  function mkCard(a){
+    const isUnlocked=!!achUnlocked[a.id];
+    const data=achUnlocked[a.id]||{};
+    let current=0, targetVal=a.target;
+    if(a.type==='daily')        current=todayInc;
+    if(a.type==='weekly_best')  { current=weekInc; targetVal=bestWeek||1; }
+    if(a.type==='monthly_best') { current=monInc;  targetVal=bestMonth||1; }
+    const pct=targetVal>0?Math.min(100,(current/targetVal)*100):0;
+
+    // Star color per unlock tier
+    let starStyle='', cardStyle='', barColor=a.color;
+    if(isUnlocked){
+      cardStyle=`background:linear-gradient(135deg,${a.glow}44,#fff);border-color:${a.color}55;box-shadow:0 4px 20px ${a.color}22`;
+    }
+
+    const dateStr=data.unlockedAt?new Date(data.unlockedAt).toLocaleDateString('ms-MY',{day:'2-digit',month:'short',year:'numeric'}):'';
+    const valStr=data.value?`RM ${(+data.value).toFixed(2)}`:'';
+
+    return`<div class="ach-card${isUnlocked?' unlocked':''}" style="${cardStyle}">
+      ${isUnlocked?`<div class="ach-badge-new">CAPAI</div>`:''}
+      <span class="ach-star" style="${isUnlocked?`filter:drop-shadow(0 0 8px ${a.color})`:''}">
+        ${a.star}
+      </span>
+      <div class="ach-name">${a.name}</div>
+      <div class="ach-target" style="${isUnlocked?`color:${a.color};font-size:13px;font-weight:900`:''}">${a.type==='daily'?`RM ${a.target}`:isUnlocked?valStr:'—'}</div>
+      <div class="ach-progress">
+        <div class="ach-progress-bar" style="width:${pct}%;background:${isUnlocked?a.color:'#d1d5db'}"></div>
+      </div>
+      ${isUnlocked&&dateStr?`<div class="ach-date">✅ ${dateStr}</div>`:`<div class="ach-date">${a.type==='daily'?`RM ${Math.floor(current)} / RM ${a.target}`:'—'}</div>`}
+    </div>`;
+  }
+
+  const daily=ACH_DEFS.filter(a=>a.cat==='harian');
+  const weekly=ACH_DEFS.filter(a=>a.cat==='mingguan');
+  const monthly=ACH_DEFS.filter(a=>a.cat==='bulanan');
+  const MN=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+
+  return`
+    <div class="ach-hero">
+      <div class="ach-hero-title">🏆 Pencapaian</div>
+      <div class="ach-hero-sub">Maida Legacy · Rekod Pendapatan</div>
+      <div class="ach-hero-stats">
+        <div class="ach-hero-stat"><div class="ach-hero-stat-val">${totalUnlocked}/${total}</div><div class="ach-hero-stat-lbl">Dicapai</div></div>
+        <div style="width:1px;background:rgba(255,255,255,.1)"></div>
+        <div class="ach-hero-stat"><div class="ach-hero-stat-val">RM ${todayInc.toFixed(0)}</div><div class="ach-hero-stat-lbl">Hari Ini</div></div>
+        <div style="width:1px;background:rgba(255,255,255,.1)"></div>
+        <div class="ach-hero-stat"><div class="ach-hero-stat-val">RM ${monInc.toFixed(0)}</div><div class="ach-hero-stat-lbl">${MN[now.getMonth()]}</div></div>
+      </div>
+    </div>
+
+    <div class="ach-section-title">⭐ Pendapatan Harian</div>
+    <div class="ach-grid">${daily.map(mkCard).join('')}</div>
+
+    <div class="ach-section-title">🥇 Pendapatan Mingguan</div>
+    <div class="ach-grid">${weekly.map(mkCard).join('')}</div>
+
+    <div class="ach-section-title">👑 Pendapatan Bulanan</div>
+    <div class="ach-grid">${monthly.map(mkCard).join('')}</div>
+
+    <div style="text-align:center;padding:12px 16px 32px">
+      <button onclick="achCheckAndFirework();render()" style="padding:12px 28px;border:none;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(245,158,11,.4)">🔄 Semak Pencapaian Baru</button>
+    </div>`;
+}
 
 // ================================================================
 //  INIT — Load all data then show app
