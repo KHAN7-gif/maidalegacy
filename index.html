@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>MDE Finance Pro | Maida Legacy</title>
+
+<!-- ===== PWA ===== -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d4006b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MDE Finance">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<!-- ===== PWA END ===== -->
+
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -6093,7 +6105,10 @@ function psSaveBk(){
   if(psHasOvlp(ps_bF.sid,bookDate,sd,ed)){psToast('Masa bertindih dengan booking lain','r');return;}
   const stObj=PS_STATIONS.find(s=>s.id===ps_bF.sid);
   const bk={id:ps_nid++,sid:ps_bF.sid,players:ps_bF.players,payment:ps_bF.payment,joy:ps_bF.joy,dur:ps_bF.dur,st:sd.toISOString(),et:ed.toISOString(),date:bookDate,loyalty:ps_bF.loyalty,lref:ps_bF.lref,notes:ps_bF.notes,amt:psCalcTot(ps_bF),status:'a',xDS4:ps_bF.xDS4,xDS5:ps_bF.xDS5};
-  ps_bks.push(bk);psSave();psToast(`✅ St${bk.sid} (${stObj?.type}) · ${bk.players}P ${bk.payment?.toUpperCase()} · RM ${bk.amt.toFixed(2)}`,'g');
+  ps_bks.push(bk);psSave();
+  const _pwaStName=stObj?.name||'Station '+bk.sid;
+  pwaScheduleTimer(bk.id,bk.sid,_pwaStName,bk.et,bk.amt);
+  psToast(`✅ St${bk.sid} (${stObj?.type}) · ${bk.players}P ${bk.payment?.toUpperCase()} · RM ${bk.amt.toFixed(2)}`,'g');
   ps_bF=psNb();psSv('panel');
 }
 
@@ -6925,6 +6940,8 @@ window.tryLogin = () => {
     document.getElementById('lockError').classList.remove('show');
     resetLockTimer();
     applyTabVisibility();
+    // Sync PS timers to Service Worker for background notifications
+    setTimeout(() => { pwaSyncActiveBookings(); }, 1500);
     // Buka Transaksi bulan semasa
     activeTab='calendar';
     const now=new Date();
@@ -7810,6 +7827,134 @@ function autoBackupCheck(){
 }
 
 // ================================================================
+//  PWA — SERVICE WORKER & PUSH NOTIFICATIONS
+// ================================================================
+const PWA_KEY = 'mde_pwa_v1';
+let _swReg = null;
+
+async function pwaInit() {
+  if (!('serviceWorker' in navigator)) {
+    console.log('PWA: Service Worker tidak disokong');
+    return;
+  }
+  try {
+    _swReg = await navigator.serviceWorker.register('sw.js', { scope: './' });
+    console.log('✅ PWA: Service Worker didaftarkan');
+
+    // Listen for messages from SW
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data?.type === 'TIMER_END') {
+        const sid = e.data.stationId;
+        const st = PS_STATIONS?.find(s => s.id === sid);
+        psToast && psToast(`⏰ ${st?.name || 'Station '+sid} TELAH TAMAT!`, 'r');
+      }
+    });
+  } catch(err) {
+    console.warn('PWA: SW registration failed:', err);
+  }
+}
+
+async function pwaRequestNotif() {
+  if (!('Notification' in window)) {
+    alert('Browser anda tidak menyokong notifikasi push.');
+    return false;
+  }
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') {
+    alert('Notifikasi disekat. Sila benarkan notifikasi dalam tetapan browser.');
+    return false;
+  }
+  const perm = await Notification.requestPermission();
+  return perm === 'granted';
+}
+
+function pwaScheduleTimer(bkId, stationId, stationName, endIso, amtRm) {
+  if (!_swReg) return;
+  const msLeft = new Date(endIso).getTime() - Date.now();
+  if (msLeft <= 0) return;
+
+  // Schedule via SW
+  _swReg.active?.postMessage({
+    type: 'SCHEDULE_TIMER',
+    bkId, stationId, stationName,
+    endTime: new Date(endIso).getTime(),
+    amtRm
+  });
+
+  // Also schedule 5-min warning
+  const warn5 = msLeft - 300000;
+  if (warn5 > 0) {
+    _swReg.active?.postMessage({
+      type: 'SCHEDULE_WARNING',
+      bkId, stationId, stationName,
+      fireAt: Date.now() + warn5,
+      amtRm
+    });
+  }
+}
+
+function pwaCancelTimer(bkId) {
+  _swReg?.active?.postMessage({ type: 'CANCEL_TIMER', bkId });
+}
+
+// Send all active bookings to SW on load/focus
+function pwaSyncActiveBookings() {
+  if (!_swReg?.active) return;
+  const active = ps_bks.filter(b => b.status === 'a' && new Date(b.et) > new Date());
+  active.forEach(b => {
+    const st = PS_STATIONS?.find(s => s.id === b.sid);
+    pwaScheduleTimer(b.id, b.sid, st?.name || 'Station '+b.sid, b.et, b.amt);
+  });
+}
+
+// Show PWA install prompt
+let _pwaInstallEvt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaInstallEvt = e;
+  // Show install banner after 3 seconds
+  setTimeout(() => showPwaInstallBanner(), 3000);
+});
+
+function showPwaInstallBanner() {
+  if (!_pwaInstallEvt) return;
+  if (localStorage.getItem('mde_pwa_dismissed')) return;
+  let banner = document.getElementById('pwa-install-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'pwa-install-banner';
+    banner.style.cssText = 'position:fixed;bottom:80px;left:12px;right:12px;z-index:9997;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;border-radius:18px;padding:16px 18px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;align-items:center;gap:14px;animation:slideUp .3s ease;border:1px solid rgba(255,255,255,.1)';
+    banner.innerHTML = `
+      <div style="font-size:32px">📱</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:800;margin-bottom:3px">Pasang MDE Finance</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">Install app untuk notifikasi timer PS walaupun browser tutup</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button onclick="pwaInstall()" style="padding:8px 16px;border:none;border-radius:10px;background:#d4006b;color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap">Pasang</button>
+        <button onclick="pwaDismissBanner()" style="padding:5px 10px;border:none;border-radius:8px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-size:11px;cursor:pointer;font-family:inherit">Nanti</button>
+      </div>`;
+    document.body.appendChild(banner);
+  }
+}
+
+window.pwaInstall = async () => {
+  if (!_pwaInstallEvt) return;
+  _pwaInstallEvt.prompt();
+  const { outcome } = await _pwaInstallEvt.userChoice;
+  if (outcome === 'accepted') {
+    document.getElementById('pwa-install-banner')?.remove();
+    psToast && psToast('✅ MDE Finance berjaya dipasang!', 'g');
+  }
+  _pwaInstallEvt = null;
+};
+
+window.pwaDismissBanner = () => {
+  document.getElementById('pwa-install-banner')?.remove();
+  localStorage.setItem('mde_pwa_dismissed', '1');
+};
+
+// ================================================================
 //  INIT — Load all data then show app
 // ================================================================
 (async function init() {
@@ -7829,6 +7974,7 @@ function autoBackupCheck(){
   // Show lock screen on startup
   showLock(false);
   autoBackupCheck();
+  pwaInit(); // Register Service Worker
   // render() will be called after login
   showSyncStatus('ok');
 })();
