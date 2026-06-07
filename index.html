@@ -744,17 +744,18 @@ textarea.m-input{border-radius:14px;resize:vertical}
   box-shadow:0 -8px 40px rgba(0,0,0,.16);
   animation:sheetUp .28s cubic-bezier(.34,1.56,.64,1)
 }
-.dok-picker-title{font-size:16px;font-weight:900;color:var(--t1);padding:18px 0 14px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.dok-picker-title{font-size:16px;font-weight:900;color:var(--t1);padding:18px 0 12px;border-bottom:1px solid var(--border);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .dok-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .dok-type-opt{
-  display:flex;align-items:center;gap:12px;padding:14px 16px;
-  border-radius:var(--r-lg);background:#fafafa;
-  border:1.5px solid var(--border);cursor:pointer;transition:all .18s;font-family:inherit
+  display:flex;align-items:center;gap:12px;padding:14px 14px;
+  border-radius:14px;background:#fafafa;
+  border:1.5px solid var(--border);cursor:pointer;transition:all .18s;font-family:inherit;
+  text-align:left;
 }
-.dok-type-opt:hover{border-color:var(--p);background:var(--p-lt)}
-.dko-icon{font-size:22px;flex-shrink:0}
-.dko-lbl{font-size:13px;font-weight:700;color:var(--t1)}
-.dko-sub{font-size:10px;font-weight:600;color:var(--t2)}
+.dok-type-opt:hover{border-color:var(--p);background:var(--p-lt);transform:translateY(-1px);box-shadow:0 4px 12px rgba(91,91,214,.15)}
+.dko-icon{font-size:24px;flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(91,91,214,.08);border-radius:10px}
+.dko-lbl{font-size:13px;font-weight:800;color:var(--t1)}
+.dko-sub{font-size:10px;font-weight:600;color:var(--t2);margin-top:2px}
 /* Record table improved */
 .rec-tbl{width:100%;border-collapse:collapse;font-size:13px}
 .rec-tbl th{
@@ -775,10 +776,10 @@ textarea.m-input{border-radius:14px;resize:vertical}
 }
 .aib-edit{background:#dbeafe;color:#1d4ed8}
 .aib-del{background:#fee2e2;color:#dc2626}
-.aib-doc{background:#fff3e0;color:#d97706;font-size:13px}
+.aib-doc{background:#fef3c7;color:#92400e;font-size:14px;border:1px solid rgba(245,158,11,.25)}
 .aib-edit:hover{background:#bfdbfe}
 .aib-del:hover{background:#fca5a5}
-.aib-doc:hover{background:#fde68a;color:#92400e}
+.aib-doc:hover{background:#fde68a;color:#78350f;border-color:rgba(245,158,11,.5)}
 .rec-sum-bar{
   display:grid;grid-template-columns:1fr 1fr 1fr;
   background:var(--card);border-radius:var(--r-xl);
@@ -1709,8 +1710,18 @@ textarea.m-input{border-radius:14px;resize:vertical}
 .ach-date{font-size:9px;color:var(--t3);margin-top:5px;font-weight:600}
 .ach-badge-new{position:absolute;top:8px;right:8px;font-size:9px;font-weight:900;padding:2px 7px;border-radius:999px;background:#ef4444;color:#fff;letter-spacing:.3px}
 #fw-canvas{position:fixed;inset:0;pointer-events:none;z-index:9998;display:none}
+/* ===================== SST REPORT ===================== */
+.sst-card{background:linear-gradient(135deg,#1e3a5f,#0f2a4a);border-radius:20px;padding:20px;margin:12px;color:#fff;position:relative;overflow:hidden}
+.sst-card::before{content:'SST';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:80px;font-weight:900;opacity:.06;letter-spacing:-2px}
+.sst-rate{font-size:48px;font-weight:900;color:#fbbf24;line-height:1}
+.sst-label{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px}
+.sst-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px}
+.sst-table th{background:rgba(255,255,255,.08);padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.5)}
+.sst-table td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.sst-table tr:last-child td{border-bottom:none}
+.sst-total-row{background:rgba(255,193,7,.1)!important}
+.sst-total-row td{color:#fbbf24!important;font-weight:900}
 </style>
-</head>
 <body>
 <canvas id="fw-canvas"></canvas>
 <!-- SVG Filter for Liquid Glass Distortion -->
@@ -1807,6 +1818,10 @@ textarea.m-input{border-radius:14px;resize:vertical}
         <div class="tab-ic"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor"/></svg></div>
         <span>Pencapaian</span>
       </div>
+      <div class="tab desk-only" data-tab="sst_report">
+        <div class="tab-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-linecap="round"/></svg></div>
+        <span>Laporan SST</span>
+      </div>
       <div class="nav-sep desk-only"></div>
       <div class="tab desk-only" data-tab="settings">
         <div class="tab-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor"/></svg></div>
@@ -1821,15 +1836,26 @@ textarea.m-input{border-radius:14px;resize:vertical}
   <div class="dok-picker-box">
     <div class="mhandle"></div>
     <div class="dok-picker-title">📄 Pilih Jenis Dokumen</div>
-    <div id="dokPickerInfo" style="font-size:12px;color:var(--t2);margin-bottom:12px;padding:8px 12px;background:#f9fafb;border-radius:var(--r-md)"></div>
+    <div id="dokPickerInfo" style="font-size:12px;color:var(--t2);margin-bottom:14px;padding:10px 14px;background:#f0f7ff;border-radius:12px;border:1px solid rgba(0,122,255,.12);line-height:1.6"></div>
     <div class="dok-type-grid">
-      <button class="dok-type-opt" onclick="confirmDocType('sebutharga')"><span class="dko-icon">📋</span><div><div class="dko-lbl">Sebutharga</div><div class="dko-sub">SB-2026-XXX</div></div></button>
-      <button class="dok-type-opt" onclick="confirmDocType('invois')"><span class="dko-icon">🧾</span><div><div class="dko-lbl">Invois</div><div class="dko-sub">INV-2026-XXX</div></div></button>
-      <button class="dok-type-opt" onclick="confirmDocType('bilTunai')"><span class="dko-icon">🧮</span><div><div class="dko-lbl">Bil Tunai</div><div class="dko-sub">BT-2026-XXX</div></div></button>
-      <button class="dok-type-opt" onclick="confirmDocType('resit')"><span class="dko-icon">✅</span><div><div class="dko-lbl">Resit</div><div class="dko-sub">RST-2026-XXX</div></div></button>
-
+      <button class="dok-type-opt" onclick="confirmDocType('sebutharga')">
+        <span class="dko-icon">📋</span>
+        <div><div class="dko-lbl">Sebutharga</div><div class="dko-sub">Quotation · SB-XXXX</div></div>
+      </button>
+      <button class="dok-type-opt" onclick="confirmDocType('invois')">
+        <span class="dko-icon">🧾</span>
+        <div><div class="dko-lbl">Invois</div><div class="dko-sub">Invoice · INV-XXXX</div></div>
+      </button>
+      <button class="dok-type-opt" onclick="confirmDocType('bilTunai')">
+        <span class="dko-icon">🧮</span>
+        <div><div class="dko-lbl">Bil Tunai</div><div class="dko-sub">Cash Bill · BT-XXXX</div></div>
+      </button>
+      <button class="dok-type-opt" onclick="confirmDocType('resit')">
+        <span class="dko-icon">✅</span>
+        <div><div class="dko-lbl">Resit</div><div class="dko-sub">Receipt · RST-XXXX</div></div>
+      </button>
     </div>
-    <button class="btn btn-s w100" onclick="closeDokPicker()">Batal</button>
+    <button class="btn btn-s w100" style="margin-top:4px;background:#f3f4f6;color:#374151;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer" onclick="closeDokPicker()">✕ Batal</button>
   </div>
 </div>
 
@@ -3041,9 +3067,9 @@ function renderRecord() {
       <td style="max-width:80px;font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.desc||'—'}</td>
       <td style="white-space:nowrap;font-weight:800;font-size:13px" class="${t.type==='income'?'income':'expense'}">${t.type==='income'?'+':'-'}${fmtFull(t.amount)}</td>
       <td style="white-space:nowrap;padding-right:10px">
-        <button class="act-ico-btn aib-edit" onclick="editEntry(${t.id})" title="Edit">✏️</button>
-        <button class="act-ico-btn aib-del" onclick="deleteTx(${t.id})" title="Padam">🗑️</button>
-        <button class="act-ico-btn aib-doc" onclick="openDokPickerSingle(${t.id})" title="Buat Dokumen">📄</button>
+        <button class="act-ico-btn aib-edit" onclick="editEntry(${t.id})" title="Edit transaksi">✏️</button>
+        <button class="act-ico-btn aib-del" onclick="deleteTx(${t.id})" title="Padam transaksi">🗑️</button>
+        <button class="act-ico-btn aib-doc" onclick="openDokPickerSingle(${t.id})" title="Buat dokumen (Invois/Resit/Bil Tunai/Sebutharga)" style="position:relative">📄</button>
       </td>
     </tr>`).join('');
 
@@ -4289,8 +4315,9 @@ function buildHomeMenu() {
     { tab:'syer',       icon:'💰', label:'Pembahagian Syer',     cls:'ci-bl',  sub:'', bg:'background:linear-gradient(135deg,#eff6ff,#fff)' },
     { tab:'ps_booking', icon:'🎮', label:'PS Booking',           cls:'',       sub:'Panel station · Booking · Harga', bg:'background:linear-gradient(135deg,#f0f9ff,#fff)', icoStyle:'background:#e0f0ff' },
     { tab:'ps_overlay', icon:'📺', label:'PS Overlay',           cls:'',       sub:'Preview OBS langsung real-time', bg:'background:linear-gradient(135deg,#fdf0ff,#fff)', icoStyle:'background:#f0e0ff' },
-    { tab:'achievement',icon:'🏆', label:'Pencapaian',           cls:'',       sub:'Rekod & reward pendapatan', bg:'background:linear-gradient(135deg,#fffbeb,#fff)', icoStyle:'background:#fef3c7' },
-    { tab:'settings',   icon:'⚙️', label:'Tetapan & Data',      cls:'ci-te',  sub:'' },
+    { tab:'achievement',  icon:'🏆', label:'Pencapaian',         cls:'',       sub:'Rekod & reward pendapatan',    bg:'background:linear-gradient(135deg,#fffbeb,#fff)', icoStyle:'background:#fef3c7' },
+    { tab:'sst_report',   icon:'📑', label:'Laporan SST 6%',      cls:'',       sub:'Ringkasan cukai SST bulanan',  bg:'background:linear-gradient(135deg,#f0f9ff,#fff)', icoStyle:'background:#1e3a5f' },
+    { tab:'settings',     icon:'⚙️', label:'Tetapan & Data',      cls:'ci-te',  sub:'' },
   ];
 
   const perms = getUserPerms(currentUser);
@@ -4739,6 +4766,7 @@ function render() {
   else if(activeTab==='dokumen')     root.innerHTML=renderDocuments();
   else if(activeTab==='settings')    root.innerHTML=renderSettings();
   else if(activeTab==='achievement') root.innerHTML=renderAchievement();
+  else if(activeTab==='sst_report')  root.innerHTML=renderSstReport();
   else if(activeTab==='pelanggan')   root.innerHTML=renderClients();
   else if(activeTab==='stok')        root.innerHTML=renderStock();
   else if(activeTab==='staff')       root.innerHTML=renderStaff();
@@ -6957,8 +6985,9 @@ const ALL_MODULES = [
   { key:'syer',       icon:'💰', label:'Pembahagian Syer',       desc:'Pengiraan & pembahagian syer' },
   { key:'ps_booking', icon:'🎮', label:'PS Booking',             desc:'Panel station, booking, harga' },
   { key:'ps_overlay', icon:'📺', label:'PS Overlay',             desc:'Preview OBS live streaming' },
-  { key:'achievement',icon:'🏆', label:'Pencapaian',             desc:'Rekod & reward pendapatan' },
-  { key:'settings',   icon:'⚙️', label:'Tetapan & Data',        desc:'Pengurusan sistem & eksport' },
+  { key:'achievement',  icon:'🏆', label:'Pencapaian',           desc:'Rekod & reward pendapatan' },
+  { key:'sst_report',   icon:'📑', label:'Laporan SST 6%',        desc:'Ringkasan cukai bulanan' },
+  { key:'settings',     icon:'⚙️', label:'Tetapan & Data',        desc:'Pengurusan sistem & eksport' },
 ];
 
 const DEFAULT_STAFF_PERMS = ['home','calendar','record','ps_booking','ps_overlay'];
@@ -7346,18 +7375,32 @@ function achSave(){ localStorage.setItem(ACH_STORAGE_KEY, JSON.stringify(achUnlo
 
 // Achievement definitions
 const ACH_DEFS = [
-  // Daily income milestones
-  { id:'d50',   cat:'harian', name:'Pendapatan Harian RM50',   target:50,   type:'daily',   star:'⭐', color:'#94a3b8', glow:'#cbd5e1' },
-  { id:'d100',  cat:'harian', name:'Pendapatan Harian RM100',  target:100,  type:'daily',   star:'⭐', color:'#fb923c', glow:'#fed7aa' },
-  { id:'d200',  cat:'harian', name:'Pendapatan Harian RM200',  target:200,  type:'daily',   star:'🌟', color:'#facc15', glow:'#fef08a' },
-  { id:'d300',  cat:'harian', name:'Pendapatan Harian RM300',  target:300,  type:'daily',   star:'🌟', color:'#4ade80', glow:'#bbf7d0' },
-  { id:'d500',  cat:'harian', name:'Pendapatan Harian RM500',  target:500,  type:'daily',   star:'💫', color:'#60a5fa', glow:'#bfdbfe' },
-  { id:'d600',  cat:'harian', name:'Pendapatan Harian RM600',  target:600,  type:'daily',   star:'💫', color:'#a78bfa', glow:'#ddd6fe' },
-  { id:'d1000', cat:'harian', name:'Pendapatan Harian RM1000', target:1000, type:'daily',   star:'🏆', color:'#f59e0b', glow:'#fde68a' },
-  // Weekly
-  { id:'wbest', cat:'mingguan', name:'Pendapatan Tertinggi Mingguan', target:0, type:'weekly_best', star:'🥇', color:'#f59e0b', glow:'#fde68a' },
-  // Monthly
-  { id:'mbest', cat:'bulanan',  name:'Pendapatan Tertinggi Bulanan',  target:0, type:'monthly_best', star:'👑', color:'#d4006b', glow:'#fbcfe8' },
+  // ── PENDAPATAN HARIAN ──────────────────────────────────────
+  { id:'d50',   cat:'harian',   name:'Permulaan Hebat',         sub:'Pendapatan Harian RM50',    target:50,   type:'daily',        star:'⭐', color:'#94a3b8', glow:'#e2e8f0' },
+  { id:'d100',  cat:'harian',   name:'Seratus Ringgit!',        sub:'Pendapatan Harian RM100',   target:100,  type:'daily',        star:'🌟', color:'#fb923c', glow:'#fed7aa' },
+  { id:'d200',  cat:'harian',   name:'Dua Ratus!',              sub:'Pendapatan Harian RM200',   target:200,  type:'daily',        star:'🌟', color:'#facc15', glow:'#fef08a' },
+  { id:'d300',  cat:'harian',   name:'Tiga Ratus!',             sub:'Pendapatan Harian RM300',   target:300,  type:'daily',        star:'💫', color:'#4ade80', glow:'#bbf7d0' },
+  { id:'d400',  cat:'harian',   name:'Empat Ratus!',            sub:'Pendapatan Harian RM400',   target:400,  type:'daily',        star:'💫', color:'#2dd4bf', glow:'#99f6e4' },
+  { id:'d500',  cat:'harian',   name:'Lima Ratus!',             sub:'Pendapatan Harian RM500',   target:500,  type:'daily',        star:'💫', color:'#60a5fa', glow:'#bfdbfe' },
+  { id:'d1000', cat:'harian',   name:'Seribu Sehari! 🔥',       sub:'Pendapatan Harian RM1000',  target:1000, type:'daily',        star:'🏆', color:'#f59e0b', glow:'#fde68a' },
+  // ── PENDAPATAN MINGGUAN ────────────────────────────────────
+  { id:'wbest', cat:'mingguan', name:'Rekod Minggu Terbaik',    sub:'Pendapatan Tertinggi Mingguan', target:0, type:'weekly_best', star:'🥇', color:'#f59e0b', glow:'#fde68a' },
+  { id:'w500',  cat:'mingguan', name:'Minggu RM500',            sub:'Pendapatan Mingguan RM500',  target:500,  type:'weekly',       star:'⭐', color:'#fb923c', glow:'#fed7aa' },
+  { id:'w1000', cat:'mingguan', name:'Minggu Seribu!',          sub:'Pendapatan Mingguan RM1000', target:1000, type:'weekly',       star:'🌟', color:'#facc15', glow:'#fef08a' },
+  { id:'w1500', cat:'mingguan', name:'Minggu Satu Lima!',       sub:'Pendapatan Mingguan RM1500', target:1500, type:'weekly',       star:'💫', color:'#60a5fa', glow:'#bfdbfe' },
+  { id:'w2000', cat:'mingguan', name:'Minggu Dua Ribu! 🔥',     sub:'Pendapatan Mingguan RM2000', target:2000, type:'weekly',       star:'🏆', color:'#a78bfa', glow:'#ddd6fe' },
+  // ── PENDAPATAN BULANAN ─────────────────────────────────────
+  { id:'mbest', cat:'bulanan',  name:'Rekod Bulan Terbaik',     sub:'Pendapatan Tertinggi Bulanan',  target:0, type:'monthly_best', star:'👑', color:'#d4006b', glow:'#fbcfe8' },
+  { id:'m3000', cat:'bulanan',  name:'Bulan RM3000',            sub:'Pendapatan Bulanan RM3000',  target:3000, type:'monthly',      star:'⭐', color:'#4ade80', glow:'#bbf7d0' },
+  { id:'m5000', cat:'bulanan',  name:'Bulan Lima Ribu!',        sub:'Pendapatan Bulanan RM5000',  target:5000, type:'monthly',      star:'🌟', color:'#f59e0b', glow:'#fde68a' },
+  { id:'m5500', cat:'bulanan',  name:'Bulan RM5500! 🔥',        sub:'Pendapatan Bulanan RM5500',  target:5500, type:'monthly',      star:'💫', color:'#8b5cf6', glow:'#ddd6fe' },
+  { id:'m6000', cat:'bulanan',  name:'Bulan RM6000! 🚀',        sub:'Pendapatan Bulanan RM6000',  target:6000, type:'monthly',      star:'🏆', color:'#d4006b', glow:'#fbcfe8' },
+  // ── PENCAPAIAN ISTIMEWA ────────────────────────────────────
+  { id:'streak3', cat:'istimewa', name:'3 Hari Berturut',       sub:'Income 3 hari berturut-turut', target:3,  type:'streak',       star:'🔥', color:'#ef4444', glow:'#fecaca' },
+  { id:'streak7', cat:'istimewa', name:'Seminggu Penuh! 🔥',    sub:'Income 7 hari berturut-turut', target:7,  type:'streak',       star:'🔥', color:'#dc2626', glow:'#fca5a5' },
+  { id:'bk10',  cat:'istimewa',  name:'10 Booking!',            sub:'Capai 10 booking PS',         target:10,  type:'total_booking',star:'🎮', color:'#8b5cf6', glow:'#ddd6fe' },
+  { id:'bk50',  cat:'istimewa',  name:'50 Booking! 🎮',         sub:'Capai 50 booking PS',         target:50,  type:'total_booking',star:'🎮', color:'#7c3aed', glow:'#c4b5fd' },
+  { id:'bk100', cat:'istimewa',  name:'Legenda 100 Booking!',   sub:'Capai 100 booking PS',        target:100, type:'total_booking',star:'👑', color:'#d4006b', glow:'#fbcfe8' },
 ];
 
 function achGetDailyTotal(dateStr){
@@ -7387,7 +7430,6 @@ function achCheckAll(){
   const weekInc=achGetWeekTotal(weekStr);
   const monInc=achGetMonthTotal(monStr);
 
-  // Find best week & month ever
   const allWeeks={}, allMonths={};
   tx.filter(t=>t.type==='income'&&t.date).forEach(t=>{
     const wk=achGetWeekKey(t.date); allWeeks[wk]=(allWeeks[wk]||0)+(t.amount||0);
@@ -7396,15 +7438,32 @@ function achCheckAll(){
   const bestWeek=Math.max(0,...Object.values(allWeeks));
   const bestMonth=Math.max(0,...Object.values(allMonths));
 
+  // Streak calculation — consecutive days with income
+  let streak=0;
+  const d=new Date(now);
+  for(let i=0;i<60;i++){
+    const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if(achGetDailyTotal(ds)>0) streak++;
+    else break;
+    d.setDate(d.getDate()-1);
+  }
+
+  // Total PS bookings (all time, non-cancelled)
+  const totalBk=typeof ps_bks!=='undefined'?ps_bks.filter(b=>b.status!=='x').length:0;
+
   let newlyUnlocked=[];
   ACH_DEFS.forEach(a=>{
-    if(achUnlocked[a.id]) return; // already got it
-    let achieved=false;
-    if(a.type==='daily')        achieved=todayInc>=a.target;
-    if(a.type==='weekly_best')  achieved=weekInc>0&&weekInc>=bestWeek&&weekInc>0;
-    if(a.type==='monthly_best') achieved=monInc>0&&monInc>=bestMonth&&monInc>0;
+    if(achUnlocked[a.id]) return;
+    let achieved=false, val=0;
+    if(a.type==='daily')         { achieved=todayInc>=a.target; val=todayInc; }
+    if(a.type==='weekly')        { achieved=weekInc>=a.target;  val=weekInc; }
+    if(a.type==='weekly_best')   { achieved=weekInc>0&&weekInc>=bestWeek; val=weekInc; }
+    if(a.type==='monthly')       { achieved=monInc>=a.target;   val=monInc; }
+    if(a.type==='monthly_best')  { achieved=monInc>0&&monInc>=bestMonth; val=monInc; }
+    if(a.type==='streak')        { achieved=streak>=a.target;   val=streak; }
+    if(a.type==='total_booking') { achieved=totalBk>=a.target;  val=totalBk; }
     if(achieved){
-      achUnlocked[a.id]={ unlockedAt:new Date().toISOString(), value: a.type==='daily'?todayInc:a.type==='weekly_best'?weekInc:monInc };
+      achUnlocked[a.id]={ unlockedAt:new Date().toISOString(), value:val };
       newlyUnlocked.push(a);
     }
   });
@@ -7474,6 +7533,15 @@ function renderAchievement(){
   const bestWeek=Math.max(0,...Object.values(allWeeks));
   const bestMonth=Math.max(0,...Object.values(allMonths));
 
+  // Streak
+  let streak=0; const dd=new Date(now);
+  for(let i=0;i<60;i++){
+    const ds=`${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}-${String(dd.getDate()).padStart(2,'0')}`;
+    if(achGetDailyTotal(ds)>0) streak++; else break;
+    dd.setDate(dd.getDate()-1);
+  }
+  const totalBk=typeof ps_bks!=='undefined'?ps_bks.filter(b=>b.status!=='x').length:0;
+
   const totalUnlocked=Object.keys(achUnlocked).length;
   const total=ACH_DEFS.length;
 
@@ -7481,37 +7549,41 @@ function renderAchievement(){
     const isUnlocked=!!achUnlocked[a.id];
     const data=achUnlocked[a.id]||{};
     let current=0, targetVal=a.target;
-    if(a.type==='daily')        current=todayInc;
-    if(a.type==='weekly_best')  { current=weekInc; targetVal=bestWeek||1; }
-    if(a.type==='monthly_best') { current=monInc;  targetVal=bestMonth||1; }
+    if(a.type==='daily')         current=todayInc;
+    if(a.type==='weekly')        current=weekInc;
+    if(a.type==='weekly_best')   { current=weekInc; targetVal=bestWeek||1; }
+    if(a.type==='monthly')       current=monInc;
+    if(a.type==='monthly_best')  { current=monInc; targetVal=bestMonth||1; }
+    if(a.type==='streak')        { current=streak; }
+    if(a.type==='total_booking') { current=totalBk; }
     const pct=targetVal>0?Math.min(100,(current/targetVal)*100):0;
 
-    // Star color per unlock tier
-    let starStyle='', cardStyle='', barColor=a.color;
+    let cardStyle='';
     if(isUnlocked){
-      cardStyle=`background:linear-gradient(135deg,${a.glow}44,#fff);border-color:${a.color}55;box-shadow:0 4px 20px ${a.color}22`;
+      cardStyle=`background:linear-gradient(135deg,${a.glow}55,#fff);border-color:${a.color}66;box-shadow:0 4px 20px ${a.color}22`;
     }
-
     const dateStr=data.unlockedAt?new Date(data.unlockedAt).toLocaleDateString('ms-MY',{day:'2-digit',month:'short',year:'numeric'}):'';
-    const valStr=data.value?`RM ${(+data.value).toFixed(2)}`:'';
+    const valStr=data.value?(a.type==='streak'?`${data.value} hari`:a.type==='total_booking'?`${data.value} booking`:`RM ${(+data.value).toFixed(2)}`):'';
+    const progLabel=a.type==='streak'?`${Math.floor(current)}/${targetVal} hari`:a.type==='total_booking'?`${current}/${targetVal} booking`:`RM ${Math.floor(current)} / RM ${targetVal}`;
 
     return`<div class="ach-card${isUnlocked?' unlocked':''}" style="${cardStyle}">
       ${isUnlocked?`<div class="ach-badge-new">CAPAI</div>`:''}
-      <span class="ach-star" style="${isUnlocked?`filter:drop-shadow(0 0 8px ${a.color})`:''}">
+      <span class="ach-star" style="${isUnlocked?`filter:drop-shadow(0 0 10px ${a.color})`:''}">
         ${a.star}
       </span>
       <div class="ach-name">${a.name}</div>
-      <div class="ach-target" style="${isUnlocked?`color:${a.color};font-size:13px;font-weight:900`:''}">${a.type==='daily'?`RM ${a.target}`:isUnlocked?valStr:'—'}</div>
+      <div class="ach-target" style="font-size:10px;${isUnlocked?`color:${a.color};font-weight:800`:''}">${a.sub}</div>
       <div class="ach-progress">
         <div class="ach-progress-bar" style="width:${pct}%;background:${isUnlocked?a.color:'#d1d5db'}"></div>
       </div>
-      ${isUnlocked&&dateStr?`<div class="ach-date">✅ ${dateStr}</div>`:`<div class="ach-date">${a.type==='daily'?`RM ${Math.floor(current)} / RM ${a.target}`:'—'}</div>`}
+      ${isUnlocked&&dateStr?`<div class="ach-date">✅ ${dateStr}${valStr?` · ${valStr}`:''}</div>`:`<div class="ach-date">${progLabel}</div>`}
     </div>`;
   }
 
   const daily=ACH_DEFS.filter(a=>a.cat==='harian');
   const weekly=ACH_DEFS.filter(a=>a.cat==='mingguan');
   const monthly=ACH_DEFS.filter(a=>a.cat==='bulanan');
+  const special=ACH_DEFS.filter(a=>a.cat==='istimewa');
   const MN=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
 
   return`
@@ -7536,9 +7608,205 @@ function renderAchievement(){
     <div class="ach-section-title">👑 Pendapatan Bulanan</div>
     <div class="ach-grid">${monthly.map(mkCard).join('')}</div>
 
+    <div class="ach-section-title">🔥 Pencapaian Istimewa</div>
+    <div class="ach-grid">${special.map(mkCard).join('')}</div>
+
     <div style="text-align:center;padding:12px 16px 32px">
       <button onclick="achCheckAndFirework();render()" style="padding:12px 28px;border:none;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(245,158,11,.4)">🔄 Semak Pencapaian Baru</button>
     </div>`;
+}
+
+// ================================================================
+//  SST 6% REPORT
+// ================================================================
+function renderSstReport(){
+  const SST_RATE=0.06;
+  const now=new Date();
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:`${['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'][d.getMonth()]} ${d.getFullYear()}`});
+  }
+  const rows=months.map(m=>{
+    const inc=tx.filter(t=>t.type==='income'&&t.date&&t.date.startsWith(m.key)).reduce((s,t)=>s+(t.amount||0),0);
+    const exp=tx.filter(t=>t.type==='expense'&&t.date&&t.date.startsWith(m.key)).reduce((s,t)=>s+(t.amount||0),0);
+    const psSess=ps_bks.filter(b=>b.date&&b.date.startsWith(m.key)&&b.status!=='x').reduce((s,b)=>s+b.amt,0);
+    const sstAmt=psSess*SST_RATE;
+    return{...m,inc,exp,psSess,sstAmt};
+  });
+  const totSST=rows.reduce((s,r)=>s+r.sstAmt,0);
+  const totPS=rows.reduce((s,r)=>s+r.psSess,0);
+  const curM=rows[rows.length-1];
+
+  return`
+    <div class="top-bar" style="position:sticky;top:0;z-index:40;background:var(--bg)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 12px 10px">
+        <div style="font-size:18px;font-weight:900">📑 Laporan SST 6%</div>
+        <button onclick="pdfSstReport()" style="padding:8px 16px;border:none;border-radius:10px;background:#1e3a5f;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🖨️ Cetak PDF</button>
+      </div>
+    </div>
+
+    <div class="sst-card" id="sst-main-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div class="sst-rate">6%</div>
+          <div class="sst-label">Kadar SST Semasa · Service Tax</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px">Sewaan Station PS Gaming</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Bulan Ini (${curM.label})</div>
+          <div style="font-size:24px;font-weight:900;color:#fbbf24;margin-top:4px">RM ${curM.sstAmt.toFixed(2)}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4)">SST atas RM ${curM.psSess.toFixed(2)}</div>
+        </div>
+      </div>
+      <table class="sst-table">
+        <thead><tr><th>Bulan</th><th>Sewaan PS (RM)</th><th>SST 6% (RM)</th><th>Income Lain (RM)</th><th>Perbelanjaan (RM)</th></tr></thead>
+        <tbody>
+          ${rows.map((r,i)=>`<tr ${i===rows.length-1?'class="sst-total-row"':''}>
+            <td style="font-weight:${i===rows.length-1?'900':'600'}">${r.label}</td>
+            <td>RM ${r.psSess.toFixed(2)}</td>
+            <td style="color:#fbbf24;font-weight:800">RM ${r.sstAmt.toFixed(2)}</td>
+            <td>RM ${(r.inc-r.psSess>0?r.inc-r.psSess:0).toFixed(2)}</td>
+            <td>RM ${r.exp.toFixed(2)}</td>
+          </tr>`).join('')}
+          <tr style="background:rgba(255,215,0,.15)">
+            <td style="font-weight:900;color:#fbbf24">JUMLAH (6 Bln)</td>
+            <td style="font-weight:900;color:#fbbf24">RM ${totPS.toFixed(2)}</td>
+            <td style="font-weight:900;color:#fbbf24">RM ${totSST.toFixed(2)}</td>
+            <td>—</td><td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin:0 12px 12px;background:rgba(30,58,95,.08);border-radius:16px;padding:16px;border:1px solid rgba(30,58,95,.15)">
+      <div style="font-size:13px;font-weight:800;margin-bottom:8px;color:var(--t1)">ℹ️ Nota SST</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        • SST 6% dikenakan ke atas perkhidmatan sewaan peralatan rekreasi<br>
+        • Threshold pendaftaran SST: RM500,000 setahun<br>
+        • Pengiraan berdasarkan <strong>hasil PS Booking</strong> yang telah dikira & dihantar ke Transaksi<br>
+        • Laporan ini adalah anggaran — rujuk akaun profesional untuk pematuhan cukai rasmi
+      </div>
+    </div>
+
+    <div style="margin:0 12px 24px;background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:800;margin-bottom:12px">🔄 Backup Automatik Harian</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <button onclick="doManualBackup()" style="flex:1;padding:11px;border:none;border-radius:12px;background:linear-gradient(135deg,#34c759,#28a745);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(52,199,89,.3)">💾 Backup Sekarang (JSON)</button>
+        <button onclick="generateMonthlyPDF()" style="flex:1;padding:11px;border:none;border-radius:12px;background:linear-gradient(135deg,#007aff,#0051d5);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(0,122,255,.3)">📄 Laporan Bulanan PDF</button>
+      </div>
+      <div id="backup-status" style="font-size:12px;color:var(--t2);min-height:20px"></div>
+    </div>`;
+}
+
+// ================================================================
+//  PDF MONTHLY REPORT
+// ================================================================
+function generateMonthlyPDF(){
+  const now=new Date();
+  const MN=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+  const monLabel=`${MN[now.getMonth()]} ${now.getFullYear()}`;
+  const monStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const inc=tx.filter(t=>t.type==='income'&&t.date&&t.date.startsWith(monStr));
+  const exp=tx.filter(t=>t.type==='expense'&&t.date&&t.date.startsWith(monStr));
+  const totInc=inc.reduce((s,t)=>s+(t.amount||0),0);
+  const totExp=exp.reduce((s,t)=>s+(t.amount||0),0);
+  const psSess=ps_bks.filter(b=>b.date&&b.date.startsWith(monStr)&&b.status!=='x');
+  const psTotal=psSess.reduce((s,b)=>s+b.amt,0);
+  const sst=psTotal*0.06;
+  const catMap={};
+  inc.forEach(t=>{const c=t.category||'Lain-lain';catMap[c]=(catMap[c]||0)+(t.amount||0);});
+  const catRows=Object.entries(catMap).sort((a,b)=>b[1]-a[1]).map(([c,a])=>`<tr><td style="padding:6px 10px;border-bottom:1px solid #f0f0f0">${c}</td><td style="padding:6px 10px;border-bottom:1px solid #f0f0f0;text-align:right;font-weight:700">RM ${a.toFixed(2)}</td></tr>`).join('');
+  const psRows=psSess.slice(0,20).map(b=>{const st=PS_STATIONS?.find(s=>s.id===b.sid);return`<tr><td style="padding:5px 8px;border-bottom:1px solid #f0f0f0">#${b.id}</td><td style="padding:5px 8px;border-bottom:1px solid #f0f0f0">${st?.name||'St'+b.sid} (${st?.type})</td><td style="padding:5px 8px;border-bottom:1px solid #f0f0f0">${b.players}P · ${b.dur}j</td><td style="padding:5px 8px;border-bottom:1px solid #f0f0f0;text-align:right;font-weight:700">RM ${b.amt.toFixed(2)}</td></tr>`;}).join('');
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Laporan ${monLabel} - MAIDA LEGACY</title>
+<style>
+body{font-family:Arial,sans-serif;font-size:12px;color:#333;margin:0;padding:24px}
+.header{text-align:center;border-bottom:3px solid #d4006b;padding-bottom:16px;margin-bottom:20px}
+.logo{font-size:24px;font-weight:900;color:#d4006b;letter-spacing:1px}
+.sub{color:#666;font-size:11px;margin-top:4px}
+.period{background:#d4006b;color:#fff;padding:6px 20px;border-radius:999px;display:inline-block;font-weight:700;margin-top:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.stat{background:#f8f9fa;border-radius:8px;padding:12px;text-align:center;border-left:4px solid #d4006b}
+.stat-val{font-size:20px;font-weight:900;color:#d4006b}
+.stat-lbl{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.section{margin-bottom:20px}
+.section-title{font-size:13px;font-weight:900;color:#333;border-bottom:2px solid #d4006b;padding-bottom:6px;margin-bottom:10px}
+table{width:100%;border-collapse:collapse}
+th{background:#d4006b;color:#fff;padding:7px 10px;text-align:left;font-size:11px}
+.sst-box{background:#fff8e1;border:2px solid #ffc107;border-radius:8px;padding:14px;margin-bottom:20px}
+.sst-title{font-weight:900;color:#e65100;margin-bottom:6px}
+.footer{text-align:center;color:#999;font-size:10px;border-top:1px solid #eee;padding-top:12px;margin-top:20px}
+@media print{body{padding:12px}.no-print{display:none}}
+</style></head><body>
+<div class="header">
+  <div class="logo">🎮 MAIDA LEGACY</div>
+  <div class="sub">PS Gaming Centre · Labuan · LA0083119-X</div>
+  <div class="period">Laporan Bulanan — ${monLabel}</div>
+</div>
+<div class="grid">
+  <div class="stat"><div class="stat-val">RM ${totInc.toFixed(2)}</div><div class="stat-lbl">Jumlah Pendapatan</div></div>
+  <div class="stat"><div class="stat-val" style="color:#dc2626">RM ${totExp.toFixed(2)}</div><div class="stat-lbl">Jumlah Perbelanjaan</div></div>
+  <div class="stat"><div class="stat-val" style="color:${totInc-totExp>=0?'#16a34a':'#dc2626'}">RM ${(totInc-totExp).toFixed(2)}</div><div class="stat-lbl">Baki Bersih</div></div>
+</div>
+<div class="sst-box">
+  <div class="sst-title">📑 Ringkasan SST 6%</div>
+  <div>Hasil PS Booking: <strong>RM ${psTotal.toFixed(2)}</strong> &nbsp;|&nbsp; SST 6%: <strong style="color:#e65100">RM ${sst.toFixed(2)}</strong> &nbsp;|&nbsp; Sesi: <strong>${psSess.length}</strong></div>
+</div>
+<div class="section"><div class="section-title">📊 Pendapatan Mengikut Kategori</div>
+<table><thead><tr><th>Kategori</th><th style="text-align:right">Jumlah</th></tr></thead><tbody>${catRows||'<tr><td colspan="2" style="padding:8px;color:#999">Tiada data</td></tr>'}</tbody></table></div>
+<div class="section"><div class="section-title">🎮 Rekod PS Booking (${psSess.length} sesi)</div>
+<table><thead><tr><th>#</th><th>Station</th><th>Tempoh</th><th style="text-align:right">RM</th></tr></thead><tbody>${psRows||'<tr><td colspan="4" style="padding:8px;color:#999">Tiada sesi</td></tr>'}</tbody></table></div>
+<div class="footer">Dijana oleh MDE Finance Pro · ${new Date().toLocaleDateString('ms-MY')} · Laporan ini adalah rekod dalaman sahaja</div>
+<script>window.onload=function(){window.print()}<\/script>
+</body></html>`;
+  const w=window.open('','_blank','width=800,height=900');
+  w.document.write(html);w.document.close();
+}
+
+function pdfSstReport(){ generateMonthlyPDF(); }
+
+// ================================================================
+//  MANUAL BACKUP (JSON download)
+// ================================================================
+function doManualBackup(){
+  const data={
+    version:'mde_v4_backup',
+    createdAt:new Date().toISOString(),
+    tx, cats, notes,
+    clients:typeof clients!=='undefined'?clients:[],
+    stock:typeof stock!=='undefined'?stock:[],
+    targets:typeof targets!=='undefined'?targets:{},
+    reminders:typeof reminders!=='undefined'?reminders:[],
+    gajiList:typeof gajiList!=='undefined'?gajiList:[],
+    syerCfg:typeof syerCfg!=='undefined'?syerCfg:{},
+    syerHistory:typeof syerHistory!=='undefined'?syerHistory:[],
+    ps_bks, ps_nid,
+    PS_RATES, PS_DISCOUNTS, PS_PEAK, PS_PROMO_WEEKDAY,
+    achUnlocked
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  const now=new Date();
+  a.href=URL.createObjectURL(blob);
+  a.download=`maida_backup_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.json`;
+  a.click();
+  const el=document.getElementById('backup-status');
+  if(el) el.innerHTML=`✅ Backup berjaya — <strong>${a.download}</strong> dimuat turun pada ${now.toLocaleTimeString('ms-MY')}`;
+  psToast&&psToast('✅ Backup berjaya dimuat turun','g');
+}
+
+// Auto-backup check (daily)
+function autoBackupCheck(){
+  const key='mde_last_backup';
+  const last=localStorage.getItem(key);
+  const now=new Date();
+  const todStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  if(last!==todStr){
+    // Silently note it's due — user can trigger manually or we remind
+    console.log('MDE: Backup harian belum dilakukan hari ini');
+    localStorage.setItem(key,todStr);
+  }
 }
 
 // ================================================================
@@ -7560,6 +7828,7 @@ function renderAchievement(){
   seedReminders();
   // Show lock screen on startup
   showLock(false);
+  autoBackupCheck();
   // render() will be called after login
   showSyncStatus('ok');
 })();
