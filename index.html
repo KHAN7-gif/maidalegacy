@@ -7392,32 +7392,45 @@ function achSave(){ localStorage.setItem(ACH_STORAGE_KEY, JSON.stringify(achUnlo
 
 // Achievement definitions
 const ACH_DEFS = [
-  // ── PENDAPATAN HARIAN ──────────────────────────────────────
-  { id:'d50',   cat:'harian',   name:'Permulaan Hebat',         sub:'Pendapatan Harian RM50',    target:50,   type:'daily',        star:'⭐', color:'#94a3b8', glow:'#e2e8f0' },
-  { id:'d100',  cat:'harian',   name:'Seratus Ringgit!',        sub:'Pendapatan Harian RM100',   target:100,  type:'daily',        star:'🌟', color:'#fb923c', glow:'#fed7aa' },
-  { id:'d200',  cat:'harian',   name:'Dua Ratus!',              sub:'Pendapatan Harian RM200',   target:200,  type:'daily',        star:'🌟', color:'#facc15', glow:'#fef08a' },
-  { id:'d300',  cat:'harian',   name:'Tiga Ratus!',             sub:'Pendapatan Harian RM300',   target:300,  type:'daily',        star:'💫', color:'#4ade80', glow:'#bbf7d0' },
-  { id:'d400',  cat:'harian',   name:'Empat Ratus!',            sub:'Pendapatan Harian RM400',   target:400,  type:'daily',        star:'💫', color:'#2dd4bf', glow:'#99f6e4' },
-  { id:'d500',  cat:'harian',   name:'Lima Ratus!',             sub:'Pendapatan Harian RM500',   target:500,  type:'daily',        star:'💫', color:'#60a5fa', glow:'#bfdbfe' },
-  { id:'d1000', cat:'harian',   name:'Seribu Sehari! 🔥',       sub:'Pendapatan Harian RM1000',  target:1000, type:'daily',        star:'🏆', color:'#f59e0b', glow:'#fde68a' },
-  // ── PENDAPATAN MINGGUAN ────────────────────────────────────
-  { id:'wbest', cat:'mingguan', name:'Rekod Minggu Terbaik',    sub:'Pendapatan Tertinggi Mingguan', target:0, type:'weekly_best', star:'🥇', color:'#f59e0b', glow:'#fde68a' },
-  { id:'w500',  cat:'mingguan', name:'Minggu RM500',            sub:'Pendapatan Mingguan RM500',  target:500,  type:'weekly',       star:'⭐', color:'#fb923c', glow:'#fed7aa' },
-  { id:'w1000', cat:'mingguan', name:'Minggu Seribu!',          sub:'Pendapatan Mingguan RM1000', target:1000, type:'weekly',       star:'🌟', color:'#facc15', glow:'#fef08a' },
-  { id:'w1500', cat:'mingguan', name:'Minggu Satu Lima!',       sub:'Pendapatan Mingguan RM1500', target:1500, type:'weekly',       star:'💫', color:'#60a5fa', glow:'#bfdbfe' },
-  { id:'w2000', cat:'mingguan', name:'Minggu Dua Ribu! 🔥',     sub:'Pendapatan Mingguan RM2000', target:2000, type:'weekly',       star:'🏆', color:'#a78bfa', glow:'#ddd6fe' },
-  // ── PENDAPATAN BULANAN ─────────────────────────────────────
-  { id:'mbest', cat:'bulanan',  name:'Rekod Bulan Terbaik',     sub:'Pendapatan Tertinggi Bulanan',  target:0, type:'monthly_best', star:'👑', color:'#d4006b', glow:'#fbcfe8' },
-  { id:'m3000', cat:'bulanan',  name:'Bulan RM3000',            sub:'Pendapatan Bulanan RM3000',  target:3000, type:'monthly',      star:'⭐', color:'#4ade80', glow:'#bbf7d0' },
-  { id:'m5000', cat:'bulanan',  name:'Bulan Lima Ribu!',        sub:'Pendapatan Bulanan RM5000',  target:5000, type:'monthly',      star:'🌟', color:'#f59e0b', glow:'#fde68a' },
-  { id:'m5500', cat:'bulanan',  name:'Bulan RM5500! 🔥',        sub:'Pendapatan Bulanan RM5500',  target:5500, type:'monthly',      star:'💫', color:'#8b5cf6', glow:'#ddd6fe' },
-  { id:'m6000', cat:'bulanan',  name:'Bulan RM6000! 🚀',        sub:'Pendapatan Bulanan RM6000',  target:6000, type:'monthly',      star:'🏆', color:'#d4006b', glow:'#fbcfe8' },
-  // ── PENCAPAIAN ISTIMEWA ────────────────────────────────────
-  { id:'streak3', cat:'istimewa', name:'3 Hari Berturut',       sub:'Income 3 hari berturut-turut', target:3,  type:'streak',       star:'🔥', color:'#ef4444', glow:'#fecaca' },
-  { id:'streak7', cat:'istimewa', name:'Seminggu Penuh! 🔥',    sub:'Income 7 hari berturut-turut', target:7,  type:'streak',       star:'🔥', color:'#dc2626', glow:'#fca5a5' },
-  { id:'bk10',  cat:'istimewa',  name:'10 Booking!',            sub:'Capai 10 booking PS',         target:10,  type:'total_booking',star:'🎮', color:'#8b5cf6', glow:'#ddd6fe' },
-  { id:'bk50',  cat:'istimewa',  name:'50 Booking! 🎮',         sub:'Capai 50 booking PS',         target:50,  type:'total_booking',star:'🎮', color:'#7c3aed', glow:'#c4b5fd' },
-  { id:'bk100', cat:'istimewa',  name:'Legenda 100 Booking!',   sub:'Capai 100 booking PS',        target:100, type:'total_booking',star:'👑', color:'#d4006b', glow:'#fbcfe8' },
+  // ── PENDAPATAN HARIAN (RM50 → RM2500) ─────────────────────────
+  { id:'d50',      cat:'harian',   name:'Permulaan Hebat ⭐',       target:50,   type:'daily',         star:'⭐', color:'#94a3b8', glow:'#e2e8f0' },
+  { id:'d100',     cat:'harian',   name:'Seratus Ringgit! 💰',      target:100,  type:'daily',         star:'🌟', color:'#fb923c', glow:'#fed7aa' },
+  { id:'d200',     cat:'harian',   name:'Dua Ratus! 🎯',            target:200,  type:'daily',         star:'🌟', color:'#facc15', glow:'#fef08a' },
+  { id:'d300',     cat:'harian',   name:'Tiga Ratus! 🎮',           target:300,  type:'daily',         star:'💫', color:'#4ade80', glow:'#bbf7d0' },
+  { id:'d400',     cat:'harian',   name:'Empat Ratus! 🚀',          target:400,  type:'daily',         star:'💫', color:'#2dd4bf', glow:'#99f6e4' },
+  { id:'d500',     cat:'harian',   name:'Lima Ratus! 💪',           target:500,  type:'daily',         star:'💫', color:'#60a5fa', glow:'#bfdbfe' },
+  { id:'d600',     cat:'harian',   name:'Enam Ratus! 🔥',           target:600,  type:'daily',         star:'🏅', color:'#a78bfa', glow:'#ddd6fe' },
+  { id:'d700',     cat:'harian',   name:'Tujuh Ratus! ⚡',          target:700,  type:'daily',         star:'🏅', color:'#f472b6', glow:'#fbcfe8' },
+  { id:'d800',     cat:'harian',   name:'Lapan Ratus! 🌈',          target:800,  type:'daily',         star:'🏅', color:'#34d399', glow:'#a7f3d0' },
+  { id:'d1000',    cat:'harian',   name:'SERIBU SEHARI! 🔥',        target:1000, type:'daily',         star:'🏆', color:'#f59e0b', glow:'#fde68a' },
+  { id:'d1500',    cat:'harian',   name:'Satu Lima Ratus! 💎',      target:1500, type:'daily',         star:'👑', color:'#ec4899', glow:'#fce7f3' },
+  { id:'d2000',    cat:'harian',   name:'DUA RIBU! 🚀👑',           target:2000, type:'daily',         star:'👑', color:'#8b5cf6', glow:'#ede9fe' },
+  { id:'d2500',    cat:'harian',   name:'MAIDA LEGEND! 🏆🔥',       target:2500, type:'daily',         star:'🌟', color:'#d4006b', glow:'#fbcfe8' },
+  // ── PENDAPATAN MINGGUAN ────────────────────────────────────────
+  { id:'w500',     cat:'mingguan', name:'Minggu RM500 ⭐',          target:500,  type:'weekly',        star:'⭐', color:'#fb923c', glow:'#fed7aa' },
+  { id:'w1000',    cat:'mingguan', name:'Minggu Seribu! 💰',        target:1000, type:'weekly',        star:'🌟', color:'#facc15', glow:'#fef08a' },
+  { id:'w1500',    cat:'mingguan', name:'Minggu Satu Lima! 🎯',     target:1500, type:'weekly',        star:'💫', color:'#60a5fa', glow:'#bfdbfe' },
+  { id:'w2000',    cat:'mingguan', name:'Minggu Dua Ribu! 🔥',      target:2000, type:'weekly',        star:'🏆', color:'#a78bfa', glow:'#ddd6fe' },
+  { id:'w3000',    cat:'mingguan', name:'Minggu Tiga Ribu! 👑',     target:3000, type:'weekly',        star:'👑', color:'#d4006b', glow:'#fbcfe8' },
+  { id:'wbest',    cat:'mingguan', name:'Rekod Minggu Terbaik 🥇',  target:0,    type:'weekly_best',   star:'🥇', color:'#f59e0b', glow:'#fde68a' },
+  // ── PENDAPATAN BULANAN ─────────────────────────────────────────
+  { id:'m3000',    cat:'bulanan',  name:'Bulan RM3000 ⭐',          target:3000, type:'monthly',       star:'⭐', color:'#4ade80', glow:'#bbf7d0' },
+  { id:'m4000',    cat:'bulanan',  name:'Bulan Empat Ribu! 🌟',     target:4000, type:'monthly',       star:'🌟', color:'#34d399', glow:'#a7f3d0' },
+  { id:'m5000',    cat:'bulanan',  name:'Bulan Lima Ribu! 💪',      target:5000, type:'monthly',       star:'💫', color:'#f59e0b', glow:'#fde68a' },
+  { id:'m5500',    cat:'bulanan',  name:'Bulan RM5500! 🔥',         target:5500, type:'monthly',       star:'🏅', color:'#8b5cf6', glow:'#ddd6fe' },
+  { id:'m6000',    cat:'bulanan',  name:'Bulan RM6000! 🚀',         target:6000, type:'monthly',       star:'🏆', color:'#d4006b', glow:'#fbcfe8' },
+  { id:'m8000',    cat:'bulanan',  name:'Bulan Lapan Ribu! 💎',     target:8000, type:'monthly',       star:'👑', color:'#7c3aed', glow:'#c4b5fd' },
+  { id:'mbest',    cat:'bulanan',  name:'Rekod Bulan Terbaik 👑',   target:0,    type:'monthly_best',  star:'👑', color:'#d4006b', glow:'#fbcfe8' },
+  // ── PENCAPAIAN ISTIMEWA ────────────────────────────────────────
+  { id:'streak3',    cat:'istimewa', name:'3 Hari Berturut 🔥',       target:3,   type:'streak',        star:'🔥', color:'#ef4444', glow:'#fecaca' },
+  { id:'streak7',    cat:'istimewa', name:'7 Hari Penuh! 🔥🔥',       target:7,   type:'streak',        star:'🔥', color:'#dc2626', glow:'#fca5a5' },
+  { id:'streak14',   cat:'istimewa', name:'2 Minggu Berturut! 🏆',    target:14,  type:'streak',        star:'🏆', color:'#b91c1c', glow:'#fee2e2' },
+  { id:'bk10',       cat:'istimewa', name:'10 Booking PS! 🎮',         target:10,  type:'total_booking', star:'🎮', color:'#8b5cf6', glow:'#ddd6fe' },
+  { id:'bk50',       cat:'istimewa', name:'50 Booking PS! 🎮🔥',       target:50,  type:'total_booking', star:'🎮', color:'#7c3aed', glow:'#c4b5fd' },
+  { id:'bk100',      cat:'istimewa', name:'100 Booking! Legenda 👑',   target:100, type:'total_booking', star:'👑', color:'#d4006b', glow:'#fbcfe8' },
+  { id:'bk200',      cat:'istimewa', name:'200 Booking! MAIDA 🏆',     target:200, type:'total_booking', star:'🏆', color:'#0f172a', glow:'#cbd5e1' },
+  { id:'ps5first',   cat:'istimewa', name:'Pertama PS5! 🎮',           target:1,   type:'ps5_booking',   star:'🎮', color:'#3b82f6', glow:'#bfdbfe' },
+  { id:'allstation', cat:'istimewa', name:'Semua Station Penuh! 🔥',   target:10,  type:'all_stations',  star:'🔥', color:'#f59e0b', glow:'#fde68a' },
 ];
 
 function achGetDailyTotal(dateStr){
@@ -7467,18 +7480,25 @@ function achCheckAll(){
 
   // Total PS bookings (all time, non-cancelled)
   const totalBk=typeof ps_bks!=='undefined'?ps_bks.filter(b=>b.status!=='x').length:0;
+  // PS5 bookings
+  const totalPs5Bk=typeof ps_bks!=='undefined'?ps_bks.filter(b=>b.status!=='x'&&PS_STATIONS?.find(s=>s.id===b.sid)?.type==='PS5').length:0;
+  // All stations full right now
+  const nowMs=Date.now();
+  const activeNow=typeof ps_bks!=='undefined'?ps_bks.filter(b=>b.status==='a'&&new Date(b.st)<=nowMs&&new Date(b.et)>nowMs).length:0;
 
   let newlyUnlocked=[];
   ACH_DEFS.forEach(a=>{
     if(achUnlocked[a.id]) return;
     let achieved=false, val=0;
-    if(a.type==='daily')         { achieved=todayInc>=a.target; val=todayInc; }
-    if(a.type==='weekly')        { achieved=weekInc>=a.target;  val=weekInc; }
+    if(a.type==='daily')         { achieved=todayInc>=a.target;   val=todayInc; }
+    if(a.type==='weekly')        { achieved=weekInc>=a.target;    val=weekInc; }
     if(a.type==='weekly_best')   { achieved=weekInc>0&&weekInc>=bestWeek; val=weekInc; }
-    if(a.type==='monthly')       { achieved=monInc>=a.target;   val=monInc; }
+    if(a.type==='monthly')       { achieved=monInc>=a.target;     val=monInc; }
     if(a.type==='monthly_best')  { achieved=monInc>0&&monInc>=bestMonth; val=monInc; }
-    if(a.type==='streak')        { achieved=streak>=a.target;   val=streak; }
-    if(a.type==='total_booking') { achieved=totalBk>=a.target;  val=totalBk; }
+    if(a.type==='streak')        { achieved=streak>=a.target;     val=streak; }
+    if(a.type==='total_booking') { achieved=totalBk>=a.target;    val=totalBk; }
+    if(a.type==='ps5_booking')   { achieved=totalPs5Bk>=a.target; val=totalPs5Bk; }
+    if(a.type==='all_stations')  { achieved=activeNow>=10;        val=activeNow; }
     if(achieved){
       achUnlocked[a.id]={ unlockedAt:new Date().toISOString(), value:val };
       newlyUnlocked.push(a);
@@ -7573,6 +7593,8 @@ function renderAchievement(){
     if(a.type==='monthly_best')  { current=monInc; targetVal=bestMonth||1; }
     if(a.type==='streak')        { current=streak; }
     if(a.type==='total_booking') { current=totalBk; }
+    if(a.type==='ps5_booking')   { current=typeof ps_bks!=='undefined'?ps_bks.filter(b=>b.status!=='x'&&PS_STATIONS?.find(s=>s.id===b.sid)?.type==='PS5').length:0; }
+    if(a.type==='all_stations')  { const nowMs2=Date.now();current=typeof ps_bks!=='undefined'?ps_bks.filter(b=>b.status==='a'&&new Date(b.st)<=nowMs2&&new Date(b.et)>nowMs2).length:0; }
     const pct=targetVal>0?Math.min(100,(current/targetVal)*100):0;
 
     let cardStyle='';
@@ -7639,20 +7661,39 @@ function renderAchievement(){
 function renderSstReport(){
   const SST_RATE=0.06;
   const now=new Date();
+  const MN=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
   const months=[];
   for(let i=5;i>=0;i--){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:`${['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'][d.getMonth()]} ${d.getFullYear()}`});
+    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:`${MN[d.getMonth()]} ${d.getFullYear()}`});
   }
+
   const rows=months.map(m=>{
-    const inc=tx.filter(t=>t.type==='income'&&t.date&&t.date.startsWith(m.key)).reduce((s,t)=>s+(t.amount||0),0);
+    const allInc=tx.filter(t=>t.type==='income'&&t.date&&t.date.startsWith(m.key));
     const exp=tx.filter(t=>t.type==='expense'&&t.date&&t.date.startsWith(m.key)).reduce((s,t)=>s+(t.amount||0),0);
-    const psSess=ps_bks.filter(b=>b.date&&b.date.startsWith(m.key)&&b.status!=='x').reduce((s,b)=>s+b.amt,0);
-    const sstAmt=psSess*SST_RATE;
-    return{...m,inc,exp,psSess,sstAmt};
+    const totInc=allInc.reduce((s,t)=>s+(t.amount||0),0);
+
+    // PS Booking sewaan: from ps_bks directly
+    const psBkAmt=ps_bks.filter(b=>b.date&&b.date.startsWith(m.key)&&b.status!=='x').reduce((s,b)=>s+b.amt,0);
+
+    // Also from Transaksi with Sewaan keyword (for older months before PS Booking existed)
+    const txSewaan=allInc.filter(t=>{
+      const cat=(t.category||'').toLowerCase();
+      const desc=(t.desc||'').toLowerCase();
+      return cat.includes('sewaan')||cat.includes('ps booking')||cat.includes('station')||desc.includes('ps booking')||desc.includes('sewaan');
+    }).reduce((s,t)=>s+(t.amount||0),0);
+
+    // Use whichever is higher (avoid double-counting if same data)
+    const psTotal=Math.max(psBkAmt, txSewaan);
+    const sstAmt=psTotal*SST_RATE;
+    const otherInc=Math.max(0,totInc-psTotal);
+    return{...m,inc:totInc,exp,psTotal,psBkAmt,txSewaan,sstAmt,otherInc};
   });
+
   const totSST=rows.reduce((s,r)=>s+r.sstAmt,0);
-  const totPS=rows.reduce((s,r)=>s+r.psSess,0);
+  const totPS=rows.reduce((s,r)=>s+r.psTotal,0);
+  const totInc=rows.reduce((s,r)=>s+r.inc,0);
+  const totExp=rows.reduce((s,r)=>s+r.exp,0);
   const curM=rows[rows.length-1];
 
   return`
@@ -7664,7 +7705,7 @@ function renderSstReport(){
     </div>
 
     <div class="sst-card" id="sst-main-card">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
           <div class="sst-rate">6%</div>
           <div class="sst-label">Kadar SST Semasa · Service Tax</div>
@@ -7672,28 +7713,43 @@ function renderSstReport(){
         </div>
         <div style="text-align:right">
           <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Bulan Ini (${curM.label})</div>
-          <div style="font-size:24px;font-weight:900;color:#fbbf24;margin-top:4px">RM ${curM.sstAmt.toFixed(2)}</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.4)">SST atas RM ${curM.psSess.toFixed(2)}</div>
+          <div style="font-size:28px;font-weight:900;color:#fbbf24;margin-top:4px">RM ${curM.sstAmt.toFixed(2)}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4)">SST atas RM ${curM.psTotal.toFixed(2)}</div>
         </div>
       </div>
-      <table class="sst-table">
-        <thead><tr><th>Bulan</th><th>Sewaan PS (RM)</th><th>SST 6% (RM)</th><th>Income Lain (RM)</th><th>Perbelanjaan (RM)</th></tr></thead>
-        <tbody>
-          ${rows.map((r,i)=>`<tr ${i===rows.length-1?'class="sst-total-row"':''}>
-            <td style="font-weight:${i===rows.length-1?'900':'600'}">${r.label}</td>
-            <td>RM ${r.psSess.toFixed(2)}</td>
-            <td style="color:#fbbf24;font-weight:800">RM ${r.sstAmt.toFixed(2)}</td>
-            <td>RM ${(r.inc-r.psSess>0?r.inc-r.psSess:0).toFixed(2)}</td>
-            <td>RM ${r.exp.toFixed(2)}</td>
-          </tr>`).join('')}
-          <tr style="background:rgba(255,215,0,.15)">
-            <td style="font-weight:900;color:#fbbf24">JUMLAH (6 Bln)</td>
-            <td style="font-weight:900;color:#fbbf24">RM ${totPS.toFixed(2)}</td>
-            <td style="font-weight:900;color:#fbbf24">RM ${totSST.toFixed(2)}</td>
-            <td>—</td><td>—</td>
-          </tr>
-        </tbody>
-      </table>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;padding:12px;background:rgba(255,255,255,.05);border-radius:10px">
+        <div style="text-align:center"><div style="font-size:16px;font-weight:900;color:#4ade80">RM ${totInc.toFixed(2)}</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">JUMLAH INCOME</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:900;color:#fbbf24">RM ${totPS.toFixed(2)}</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">SEWAAN PS</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:900;color:#f87171">RM ${totSST.toFixed(2)}</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">JUMLAH SST</div></div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="sst-table">
+          <thead><tr><th>Bulan</th><th>Sewaan PS (RM)</th><th>SST 6% (RM)</th><th>Income Lain (RM)</th><th>Perbelanjaan (RM)</th></tr></thead>
+          <tbody>
+            ${rows.map((r,i)=>{
+              const isCur=i===rows.length-1;
+              const srcNote=r.psBkAmt>0&&r.txSewaan>0?'*':'';
+              return`<tr ${isCur?'class="sst-total-row"':''}>
+                <td style="font-weight:${isCur?'900':'600'}">${r.label}</td>
+                <td style="${r.psTotal>0?'color:#fbbf24;font-weight:800':''}">RM ${r.psTotal.toFixed(2)}${srcNote}</td>
+                <td style="color:#fbbf24;font-weight:800">RM ${r.sstAmt.toFixed(2)}</td>
+                <td>RM ${r.otherInc.toFixed(2)}</td>
+                <td>RM ${r.exp.toFixed(2)}</td>
+              </tr>`;
+            }).join('')}
+            <tr style="background:rgba(255,215,0,.12)">
+              <td style="font-weight:900;color:#fbbf24">JUMLAH (6 Bln)</td>
+              <td style="font-weight:900;color:#fbbf24">RM ${totPS.toFixed(2)}</td>
+              <td style="font-weight:900;color:#fbbf24">RM ${totSST.toFixed(2)}</td>
+              <td style="color:rgba(255,255,255,.5)">—</td>
+              <td style="color:rgba(255,255,255,.5)">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:8px">* Nilai mengambil kira PS Booking dan Transaksi bertajuk Sewaan — diambil nilai tertinggi untuk elak pengiraan berganda.</div>
     </div>
 
     <div style="margin:0 12px 12px;background:rgba(30,58,95,.08);border-radius:16px;padding:16px;border:1px solid rgba(30,58,95,.15)">
@@ -7701,13 +7757,14 @@ function renderSstReport(){
       <div style="font-size:12px;color:var(--t2);line-height:1.7">
         • SST 6% dikenakan ke atas perkhidmatan sewaan peralatan rekreasi<br>
         • Threshold pendaftaran SST: RM500,000 setahun<br>
-        • Pengiraan berdasarkan <strong>hasil PS Booking</strong> yang telah dikira & dihantar ke Transaksi<br>
+        • Pengiraan berdasarkan <strong>PS Booking</strong> dan transaksi income bertajuk <strong>Sewaan</strong><br>
+        • Bulan sebelum PS Booking digunakan: data diambil dari Transaksi manual<br>
         • Laporan ini adalah anggaran — rujuk akaun profesional untuk pematuhan cukai rasmi
       </div>
     </div>
 
     <div style="margin:0 12px 24px;background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--border)">
-      <div style="font-size:13px;font-weight:800;margin-bottom:12px">🔄 Backup Automatik Harian</div>
+      <div style="font-size:13px;font-weight:800;margin-bottom:12px">🔄 Backup & Laporan</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
         <button onclick="doManualBackup()" style="flex:1;padding:11px;border:none;border-radius:12px;background:linear-gradient(135deg,#34c759,#28a745);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(52,199,89,.3)">💾 Backup Sekarang (JSON)</button>
         <button onclick="generateMonthlyPDF()" style="flex:1;padding:11px;border:none;border-radius:12px;background:linear-gradient(135deg,#007aff,#0051d5);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(0,122,255,.3)">📄 Laporan Bulanan PDF</button>
