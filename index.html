@@ -2151,7 +2151,7 @@ function saveAll() {
 
   // Debounce Firebase save (300ms)
   clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(() => _syncCoreToCloud(), 300);
+  _saveTimer = setTimeout(() => _syncCoreToCloud(), 5000);
 }
 
 async function _syncCoreToCloud() {
@@ -2192,7 +2192,7 @@ function saveModules() {
   localStorage.setItem(SK_TARGETS,  JSON.stringify(targets));
   localStorage.setItem(SK_REMIND,   JSON.stringify(reminders));
   clearTimeout(_saveTimer2);
-  _saveTimer2 = setTimeout(() => _syncModulesToCloud(), 300);
+  _saveTimer2 = setTimeout(() => _syncModulesToCloud(), 5000);
 }
 let _saveTimer2 = null;
 
@@ -2221,7 +2221,7 @@ function saveDocs() {
   localStorage.setItem(SK_DOCS, JSON.stringify(docs));
   localStorage.setItem(SK_SIGN, JSON.stringify(docSignatures));
   clearTimeout(_saveTimer3);
-  _saveTimer3 = setTimeout(() => fbSet('mde/docs', { docs, sigs: docSignatures, _ts: Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 300);
+  _saveTimer3 = setTimeout(() => fbSet('mde/docs', { docs, sigs: docSignatures, _ts: Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 5000);
 }
 let _saveTimer3 = null;
 
@@ -2245,14 +2245,14 @@ async function loadGaji() {
 function saveGaji() {
   localStorage.setItem(SK_GAJI, JSON.stringify(gajiList));
   clearTimeout(_saveTimer4);
-  _saveTimer4 = setTimeout(() => fbSet('mde/gaji', { list: gajiList, _ts: Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 300);
+  _saveTimer4 = setTimeout(() => fbSet('mde/gaji', { list: gajiList, _ts: Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 5000);
 }
 let _saveTimer4 = null;
 
 function saveSyer() {
   localStorage.setItem(SK_SYER, JSON.stringify({cfg:syerCfg, history:syerHistory}));
   clearTimeout(_saveTimer5);
-  _saveTimer5 = setTimeout(() => fbSet('mde/gaji', { list: gajiList, syerCfg, syerHist: syerHistory, _ts: Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 300);
+  _saveTimer5 = setTimeout(() => fbSet('mde/gaji', { list: gajiList, syerCfg, syerHist: syerHistory, _ts: Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 5000);
 }
 let _saveTimer5 = null;
 
@@ -2267,7 +2267,7 @@ async function loadStaff() {
 function saveStaff() {
   localStorage.setItem(SK_STAFF, JSON.stringify(staffList));
   clearTimeout(_saveTimer6);
-  _saveTimer6 = setTimeout(() => fbSet('mde/staff', { list: staffList, _ts: Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 300);
+  _saveTimer6 = setTimeout(() => fbSet('mde/staff', { list: staffList, _ts: Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 5000);
 }
 let _saveTimer6 = null;
 
@@ -2297,7 +2297,7 @@ async function psLoad() {
 function psSave() {
   localStorage.setItem(PS_SK, JSON.stringify({bks:ps_bks, nid:ps_nid}));
   clearTimeout(_psSaveTimer);
-  _psSaveTimer = setTimeout(() => fbSet('mde/psbooking', { bks:ps_bks, nid:ps_nid, _ts:Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 300);
+  _psSaveTimer = setTimeout(() => fbSet('mde/psbooking', { bks:ps_bks, nid:ps_nid, _ts:Date.now() }).then(ok=>showSyncStatus(ok?'ok':'error')), 5000);
 }
 let _psSaveTimer = null;
 
@@ -2305,37 +2305,61 @@ function psSaveR() {
   const data={RATES:PS_RATES,DISCOUNTS:PS_DISCOUNTS,PEAK:PS_PEAK,PROMO_WEEKDAY:PS_PROMO_WEEKDAY};
   localStorage.setItem(PS_SR, JSON.stringify(data));
   clearTimeout(_psSaveRTimer);
-  _psSaveRTimer = setTimeout(() => fbSet('mde/psbooking/rates', data).then(ok=>showSyncStatus(ok?'ok':'error')), 300);
+  _psSaveRTimer = setTimeout(() => fbSet('mde/psbooking/rates', data).then(ok=>showSyncStatus(ok?'ok':'error')), 5000);
 }
 let _psSaveRTimer = null;
 
 // ================================================================
-//  PULL LATEST FROM CLOUD (refresh button / on focus)
+//  PULL LATEST FROM CLOUD (throttled — max sekali per 30 minit)
 // ================================================================
-async function pullFromCloud() {
+let _lastPullTime = 0;
+const PULL_THROTTLE_MS = 30 * 60 * 1000; // 30 minit
+
+async function pullFromCloud(force=false) {
+  const now = Date.now();
+  if (!force && (now - _lastPullTime) < PULL_THROTTLE_MS) {
+    console.log('[FB] Pull throttled — baru pull', Math.round((now-_lastPullTime)/60000), 'minit lalu');
+    return;
+  }
+  _lastPullTime = now;
   showSyncStatus('syncing');
   await loadData();
   await loadModules();
-  await loadDocs();
-  await loadGaji();
-  await loadStaff();
+  // Skip loadDocs/loadGaji/loadStaff on background pull — jarang berubah
+  if (force) {
+    await loadDocs();
+    await loadGaji();
+    await loadStaff();
+  }
   await psLoad();
   render();
   showSyncStatus('ok');
 }
 
-// Auto-pull when tab becomes visible (user switches back from phone)
+// Auto-pull HANYA bila app di-foreground selepas lama tersembunyi
+let _hiddenAt = 0;
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    setTimeout(pullFromCloud, 500);
+  if (document.hidden) {
+    _hiddenAt = Date.now();
+  } else {
+    // Hanya pull kalau app tersembunyi lebih 5 minit
+    const hiddenFor = Date.now() - _hiddenAt;
+    if (_hiddenAt > 0 && hiddenFor > 5 * 60 * 1000) {
+      setTimeout(() => pullFromCloud(false), 1000);
+    }
+    _hiddenAt = 0;
   }
 });
 
-// Pull when window gets focus (desktop alt-tab)
+// Desktop focus — throttled, tidak setiap kali alt-tab
+let _lastFocusPull = 0;
 window.addEventListener('focus', () => {
-  setTimeout(pullFromCloud, 300);
+  const now = Date.now();
+  if (now - _lastFocusPull > 30 * 60 * 1000) {
+    _lastFocusPull = now;
+    setTimeout(() => pullFromCloud(false), 500);
+  }
 });
-
 
 
 // ================================================================
@@ -2381,7 +2405,9 @@ function generateDummyData() {
   push('2026-05-01','expense',177.51,'🏢 Sewa','Sewa Lot Kedai');
   push('2026-05-10','expense',250,'💰 Gaji','Gaji Pekerja');
 
-  saveAll();
+  // Save to localStorage ONLY — jangan sync dummy data ke Firebase
+  localStorage.setItem(SK_TX, JSON.stringify(tx));
+  localStorage.setItem(SK_CATS, JSON.stringify(cats));
 }
 
 // ================================================================
@@ -4700,7 +4726,7 @@ function renderSettings() {
       <div class="menu-row" onclick="exportXLSX()"><div class="m-icon ci-ye">📤</div><div class="m-label">Export Excel (.xlsx)</div><div class="m-arr">›</div></div>
       <div class="menu-row" onclick="exportCSV()"><div class="m-icon ci-bl">📎</div><div class="m-label">Export CSV</div><div class="m-arr">›</div></div>
       <div class="menu-row" onclick="exportReport()"><div class="m-icon ci-pu">📑</div><div class="m-label">Laporan Bulanan XLSX</div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="pullFromCloud()" style="background:linear-gradient(135deg,#f0f9ff,#fff)"><div class="m-icon ci-bl">☁️</div><div style="flex:1"><div class="m-label">Sync dari Cloud</div><div style="font-size:11px;color:var(--t2)">Tarik data terbaru dari Firebase</div></div><div class="m-arr">›</div></div>
+      <div class="menu-row" onclick="pullFromCloud(true)" style="background:linear-gradient(135deg,#f0f9ff,#fff)"><div class="m-icon ci-bl">☁️</div><div style="flex:1"><div class="m-label">Sync dari Cloud</div><div style="font-size:11px;color:var(--t2)">Tarik data terbaru dari Firebase (paksa)</div></div><div class="m-arr">›</div></div>
       <div class="menu-row" onclick="exportJSON()"><div class="m-icon ci-or">📤</div><div class="m-label">Export Transaksi JSON</div><div style="font-size:11px;color:var(--t2)">Rekod yang ditapis sahaja</div><div class="m-arr">›</div></div>
       <div class="menu-row" onclick="exportAllJSON()" style="background:linear-gradient(135deg,#fef3c7,#fff)">
         <div class="m-icon ci-or">🗄️</div>
