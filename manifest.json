@@ -1,14 +1,15 @@
 {
-  "name": "MDE Finance Pro — MAIDA LEGACY",
+  "name": "MDE Finance Pro — Maida Legacy",
   "short_name": "MDE Finance",
-  "description": "Sistem pengurusan kewangan, PS Booking & operasi MAIDA LEGACY",
-  "start_url": "/index.html",
+  "description": "Sistem Pengurusan Kewangan & PS Booking untuk Maida Legacy",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#f7f3ef",
-  "theme_color": "#d4006b",
   "orientation": "portrait-primary",
+  "background_color": "#f2f2f7",
+  "theme_color": "#d4006b",
   "lang": "ms",
-  "scope": "/",
+  "categories": ["finance", "business", "productivity"],
   "icons": [
     {
       "src": "icon-192.png",
@@ -26,11 +27,19 @@
   "shortcuts": [
     {
       "name": "PS Booking",
-      "short_name": "Booking",
-      "description": "Buka PS Booking terus",
-      "url": "/index.html",
+      "short_name": "PS Booking",
+      "description": "Buka panel station PS Booking",
+      "url": "./index.html#ps_booking",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Transaksi",
+      "short_name": "Transaksi",
+      "description": "Tambah transaksi baru",
+      "url": "./index.html#calendar",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ],
-  "categories": ["finance", "business", "productivity"]
+  "screenshots": [],
+  "prefer_related_applications": false
 }
