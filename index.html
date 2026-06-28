@@ -4,18 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>MDE Finance Pro | Maida Legacy</title>
-<!-- PWA Meta -->
 <meta name="theme-color" content="#d4006b">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MDE Finance">
-<meta name="application-name" content="MDE Finance">
-<meta name="description" content="Sistem pengurusan kewangan & PS Booking MAIDA LEGACY">
+<meta name="description" content="Sistem kewangan & PS Booking MAIDA LEGACY">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -3620,35 +3617,7 @@ function importExcelFile() {
 function printPDF() {
   const f=getFiltered();
   const w=window.open('','_blank');
-  w.document.write(`<html><head><title>Rekod Transaksi</title><style>body{font-family:Arial,sans-serif;padding:24px;font-size:13px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:7px}th{background:#f5f5f5;font-weight:700}.in{color:#16a34a}.ex{color:#dc2626}</style></head><body><h2>Rekod Transaksi MDE Finance</h2><p style="color:#666;margin-bottom:12px">Diexport: ${new Date().toLocaleString('ms-MY')}</p><table><thead><tr><th>Tarikh</th><th>Jenis</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th></tr></thead><tbody>${f.map(t=>`<tr><td>${t.date}</td><td><b class="${t.type==='income'?'in':'ex'}">${t.type==='income'?'Pendapatan':'Perbelanjaan'}</b></td><td>${t.category}</td><td>${t.desc}</td><td class="${t.type==='income'?'in':'ex'}">${t.type==='income'?'+':'-'}RM ${t.amount.toFixed(2)}</td></tr>`).join('')}</tbody></table>
-<script>
-// Register Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(reg){
-        console.log('[MDE] SW registered:', reg.scope);
-        // Check for updates
-        reg.addEventListener('updatefound', function(){
-          var newSW = reg.installing;
-          if(newSW){
-            newSW.addEventListener('statechange', function(){
-              if(newSW.state === 'installed' && navigator.serviceWorker.controller){
-                // New version available
-                if(confirm('Versi baru MDE Finance tersedia! Muat semula sekarang?')){
-                  newSW.postMessage({type:'SKIP_WAITING'});
-                  window.location.reload();
-                }
-              }
-            });
-          }
-        });
-      })
-      .catch(function(err){ console.warn('[MDE] SW failed:', err); });
-  });
-}
-</script>
-</body></html>`);
+  w.document.write(`<html><head><title>Rekod Transaksi</title><style>body{font-family:Arial,sans-serif;padding:24px;font-size:13px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:7px}th{background:#f5f5f5;font-weight:700}.in{color:#16a34a}.ex{color:#dc2626}</style></head><body><h2>Rekod Transaksi MDE Finance</h2><p style="color:#666;margin-bottom:12px">Diexport: ${new Date().toLocaleString('ms-MY')}</p><table><thead><tr><th>Tarikh</th><th>Jenis</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th></tr></thead><tbody>${f.map(t=>`<tr><td>${t.date}</td><td><b class="${t.type==='income'?'in':'ex'}">${t.type==='income'?'Pendapatan':'Perbelanjaan'}</b></td><td>${t.category}</td><td>${t.desc}</td><td class="${t.type==='income'?'in':'ex'}">${t.type==='income'?'+':'-'}RM ${t.amount.toFixed(2)}</td></tr>`).join('')}</tbody></table></body></html>`);
   w.document.close(); setTimeout(()=>w.print(),300);
 }
 
@@ -4335,35 +4304,7 @@ ${subj?`<div class="subj-bar"><span>Subject:</span>${subj}</div>`:''}
     <div class="sig-lbl">Authorized Signatory</div>
   </div>
 </div>
-</div>
-<script>
-// Register Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(reg){
-        console.log('[MDE] SW registered:', reg.scope);
-        // Check for updates
-        reg.addEventListener('updatefound', function(){
-          var newSW = reg.installing;
-          if(newSW){
-            newSW.addEventListener('statechange', function(){
-              if(newSW.state === 'installed' && navigator.serviceWorker.controller){
-                // New version available
-                if(confirm('Versi baru MDE Finance tersedia! Muat semula sekarang?')){
-                  newSW.postMessage({type:'SKIP_WAITING'});
-                  window.location.reload();
-                }
-              }
-            });
-          }
-        });
-      })
-      .catch(function(err){ console.warn('[MDE] SW failed:', err); });
-  });
-}
-</script>
-</body></html>`;
+</div></body></html>`;
 }
 
 // ================================================================
@@ -5341,35 +5282,7 @@ function gajiExportCSV(){
 function gajiExportPrint(){
   const rows=gajiList.map(g=>`<tr><td>${g.date}</td><td>${g.name}</td><td>${g.type==='staff'?'Staff':'Part Time'}</td><td>RM ${g.basic.toFixed(2)}</td><td>RM ${g.incentive.toFixed(2)}</td><td>RM ${g.parking.toFixed(2)}</td><td><b>RM ${g.total.toFixed(2)}</b></td><td>${g.notes||''}</td></tr>`).join('');
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><title>Rekod Gaji</title><style>body{font-family:Arial,sans-serif;padding:24px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;font-size:12px}th{background:#f5f5f5;font-weight:700}h2{margin-bottom:8px}</style></head><body><h2>💼 Rekod Gaji Staff & Part Time — MAIDA LEGACY</h2><p style="color:#666;margin-bottom:12px">Diexport: ${new Date().toLocaleString('ms-MY')}</p><table><thead><tr><th>Tarikh</th><th>Nama</th><th>Jenis</th><th>Gaji Asas</th><th>Insentif</th><th>Elaun Parking</th><th>Jumlah</th><th>Catatan</th></tr></thead><tbody>${rows}</tbody></table><script>window.print()<\/script>
-<script>
-// Register Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(reg){
-        console.log('[MDE] SW registered:', reg.scope);
-        // Check for updates
-        reg.addEventListener('updatefound', function(){
-          var newSW = reg.installing;
-          if(newSW){
-            newSW.addEventListener('statechange', function(){
-              if(newSW.state === 'installed' && navigator.serviceWorker.controller){
-                // New version available
-                if(confirm('Versi baru MDE Finance tersedia! Muat semula sekarang?')){
-                  newSW.postMessage({type:'SKIP_WAITING'});
-                  window.location.reload();
-                }
-              }
-            });
-          }
-        });
-      })
-      .catch(function(err){ console.warn('[MDE] SW failed:', err); });
-  });
-}
-</script>
-</body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><title>Rekod Gaji</title><style>body{font-family:Arial,sans-serif;padding:24px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;font-size:12px}th{background:#f5f5f5;font-weight:700}h2{margin-bottom:8px}</style></head><body><h2>💼 Rekod Gaji Staff & Part Time — MAIDA LEGACY</h2><p style="color:#666;margin-bottom:12px">Diexport: ${new Date().toLocaleString('ms-MY')}</p><table><thead><tr><th>Tarikh</th><th>Nama</th><th>Jenis</th><th>Gaji Asas</th><th>Insentif</th><th>Elaun Parking</th><th>Jumlah</th><th>Catatan</th></tr></thead><tbody>${rows}</tbody></table><script>window.print()<\/script></body></html>`);
   w.document.close();
 }
 
@@ -5948,35 +5861,7 @@ window.printSlipGaji = function(id){
     +'</div>'
     +'</div>'
     +'<script>setTimeout(function(){},100);<\/script>'
-    +'
-<script>
-// Register Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(reg){
-        console.log('[MDE] SW registered:', reg.scope);
-        // Check for updates
-        reg.addEventListener('updatefound', function(){
-          var newSW = reg.installing;
-          if(newSW){
-            newSW.addEventListener('statechange', function(){
-              if(newSW.state === 'installed' && navigator.serviceWorker.controller){
-                // New version available
-                if(confirm('Versi baru MDE Finance tersedia! Muat semula sekarang?')){
-                  newSW.postMessage({type:'SKIP_WAITING'});
-                  window.location.reload();
-                }
-              }
-            });
-          }
-        });
-      })
-      .catch(function(err){ console.warn('[MDE] SW failed:', err); });
-  });
-}
-</script>
-</body></html>';
+    +'</body></html>';
 
   var w = window.open('','_blank','width=780,height=700');
   w.document.write(html);
@@ -6659,35 +6544,7 @@ function printRec(id){
   <div class="sep"></div>
   <div class="row tot"><span>JUMLAH:</span><span>RM ${b.amt.toFixed(2)}</span></div>
   <div class="ctr">Terima kasih! MAIDA LEGACY<br>maidalegacy@gmail.com</div>
-  <script>setTimeout(()=>window.print(),300)<\/script>
-<script>
-// Register Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(reg){
-        console.log('[MDE] SW registered:', reg.scope);
-        // Check for updates
-        reg.addEventListener('updatefound', function(){
-          var newSW = reg.installing;
-          if(newSW){
-            newSW.addEventListener('statechange', function(){
-              if(newSW.state === 'installed' && navigator.serviceWorker.controller){
-                // New version available
-                if(confirm('Versi baru MDE Finance tersedia! Muat semula sekarang?')){
-                  newSW.postMessage({type:'SKIP_WAITING'});
-                  window.location.reload();
-                }
-              }
-            });
-          }
-        });
-      })
-      .catch(function(err){ console.warn('[MDE] SW failed:', err); });
-  });
-}
-</script>
-</body></html>`);
+  <script>setTimeout(()=>window.print(),300)<\/script></body></html>`);
   w.document.close();
 }
 function bkExportCSV(){
@@ -7403,29 +7260,11 @@ showLock(false);
 </script>
 
 <script>
-// Register Service Worker
 if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(reg){
-        console.log('[MDE] SW registered:', reg.scope);
-        // Check for updates
-        reg.addEventListener('updatefound', function(){
-          var newSW = reg.installing;
-          if(newSW){
-            newSW.addEventListener('statechange', function(){
-              if(newSW.state === 'installed' && navigator.serviceWorker.controller){
-                // New version available
-                if(confirm('Versi baru MDE Finance tersedia! Muat semula sekarang?')){
-                  newSW.postMessage({type:'SKIP_WAITING'});
-                  window.location.reload();
-                }
-              }
-            });
-          }
-        });
-      })
-      .catch(function(err){ console.warn('[MDE] SW failed:', err); });
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js')
+      .then(function(r){console.log('[SW] ok');})
+      .catch(function(e){console.warn('[SW] fail',e);});
   });
 }
 </script>
