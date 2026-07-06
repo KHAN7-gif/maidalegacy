@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PS Overlay — MAIDA LEGACY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:transparent;
+  font-family:'Inter',sans-serif;
+  overflow:hidden;
+  width:1920px;
+  /* For OBS: set body to 1920x1080, position overlay at bottom */
+}
+
+/* ===== MAIN WRAPPER (bottom strip) ===== */
+.overlay-wrap{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  display:flex;flex-direction:column;
+}
+
+/* ===== STATION BAR ===== */
+.station-bar{
+  display:flex;
+  width:100%;
+}
+
+.station-box{
+  flex:1;
+  padding:8px 6px 7px;
+  text-align:center;
+  position:relative;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  transition:background .3s;
+  border-right:2px solid rgba(0,0,0,.25);
+  min-width:0;
+}
+.station-box:last-child{border-right:none}
+
+/* FREE = green */
+.station-box.free{
+  background:linear-gradient(180deg,#1e8c3a,#158030);
+}
+/* eRacing = different label color when free */
+.station-box.eRacing.free{
+  background:linear-gradient(180deg,#1a5c8a,#0f4a72);
+  border-top:3px solid #ff6b35;
+}
+.station-box.eRacing.used{
+  background:linear-gradient(180deg,#8b1a6b,#6b1355);
+  border-top:3px solid #ff6b35;
+}
+.station-box.eRacing.warning{
+  border-top:3px solid #ff6b35;
+}
+/* IN USE = red */
+.station-box.used{
+  background:linear-gradient(180deg,#c0392b,#a93226);
+}
+/* ALMOST DONE (< 5 min) = amber */
+.station-box.warning{
+  background:linear-gradient(180deg,#e67e22,#d35400);
+  animation:warn-pulse .8s infinite alternate;
+}
+@keyframes warn-pulse{from{filter:brightness(1)}to{filter:brightness(1.18)}}
+
+/* Top label */
+.sb-label{
+  font-size:11px;font-weight:800;
+  color:rgba(255,255,255,.85);
+  text-transform:uppercase;letter-spacing:.8px;
+  line-height:1;margin-bottom:3px;
+}
+/* Station type */
+.sb-type{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:26px;letter-spacing:1px;
+  color:#fff;line-height:1;
+  text-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+/* Timer or READY */
+.sb-timer{
+  font-size:16px;font-weight:900;
+  color:#fff;letter-spacing:1.5px;
+  font-family:'Bebas Neue',sans-serif;
+  line-height:1;margin-top:3px;
+  text-shadow:0 1px 4px rgba(0,0,0,.4);
+}
+.sb-timer.ready{
+  font-size:14px;font-weight:800;
+  color:rgba(255,255,255,.9);
+  letter-spacing:2px;
+  background:rgba(255,255,255,.15);
+  padding:2px 8px;border-radius:4px;
+  margin-top:4px;
+}
+/* extra info (customer type) */
+.sb-info{
+  font-size:10px;font-weight:700;
+  color:rgba(255,255,255,.75);
+  letter-spacing:.3px;margin-top:2px;
+  line-height:1;
+}
+
+/* Shine overlay effect */
+.station-box::after{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:40%;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent);
+  pointer-events:none;border-radius:0;
+}
+
+/* ===== TICKER ===== */
+.ticker{
+  background:linear-gradient(90deg,#d4006b,#9c004f);
+  height:36px;overflow:hidden;display:flex;align-items:center;
+  position:relative;
+}
+.ticker-track{
+  display:flex;white-space:nowrap;
+  animation:scroll-left 28s linear infinite;
+}
+.ticker-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;letter-spacing:3px;color:#fff;
+  padding:0 60px;
+}
+.ticker-sep{
+  font-size:18px;color:rgba(255,255,255,.5);padding:0 20px;
+}
+@keyframes scroll-left{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+
+/* Status dot */
+.live-dot{
+  position:fixed;top:12px;right:16px;
+  display:flex;align-items:center;gap:7px;
+  background:rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:30px;padding:5px 12px;
+}
+.dot{width:9px;height:9px;border-radius:50%;background:#ff3b30;animation:blink-dot .8s infinite}
+@keyframes blink-dot{0%,100%{opacity:1}50%{opacity:.2}}
+.live-txt{font-size:12px;font-weight:800;color:#fff;letter-spacing:1px}
+
+/* Clock */
+.clock-box{
+  position:fixed;top:12px;left:16px;
+  background:rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:30px;padding:5px 14px;
+  display:flex;align-items:center;gap:8px;
+}
+.clock-txt{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:2px;line-height:1}
+.clock-date{font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.5px}
+
+/* Active count badge */
+.active-badge{
+  position:fixed;top:12px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.6);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:30px;padding:5px 18px;
+  display:flex;align-items:center;gap:10px;
+}
+.ab-item{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:800;color:#fff}
+.ab-dot{width:9px;height:9px;border-radius:50%}
+
+/* OBS mode: full transparent bg */
+html{background:transparent !important}
+</style>
+</head>
+<body>
+
+<!-- Top: Live indicator -->
+<div class="live-dot">
+  <div class="dot"></div>
+  <span class="live-txt">LIVE</span>
+</div>
+
+<!-- Top: Clock -->
+<div class="clock-box">
+  <div>
+    <div class="clock-txt" id="clkTime">--:--:--</div>
+    <div class="clock-date" id="clkDate">--</div>
+  </div>
+</div>
+
+<!-- Top: Active count -->
+<div class="active-badge">
+  <div class="ab-item"><div class="ab-dot" style="background:#1db954"></div><span id="freeCount">-</span> FREE</div>
+  <div style="width:1px;height:16px;background:rgba(255,255,255,.2)"></div>
+  <div class="ab-item"><div class="ab-dot" style="background:#e53935"></div><span id="usedCount">-</span> IN USE</div>
+</div>
+
+<!-- Bottom overlay -->
+<div class="overlay-wrap">
+  <div class="station-bar" id="stationBar"></div>
+  <div class="ticker">
+    <div class="ticker-track" id="tickerTrack">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// MALAYSIA TIME
+// ================================================================
+function myNow(){const n=new Date();return new Date(n.getTime()+n.getTimezoneOffset()*60000+28800000);}
+function myToday(){const d=myNow();return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;}
+function p2(n){return String(+n||0).padStart(2,'0');}
+function getRemMs(et){if(!et)return 0;const e=new Date(et);return isNaN(e.getTime())?0:e.getTime()-new Date().getTime();}
+function fmtCd(ms){if(!ms||isNaN(ms)||ms<=0)return'00:00:00';return[Math.floor(ms/3600000),Math.floor((ms%3600000)/60000),Math.floor((ms%60000)/1000)].map(n=>p2(n)).join(':');}
+
+// ================================================================
+// DATA
+// ================================================================
+const STATIONS=Array.from({length:12},(_,i)=>({id:i+1,name:`Station ${i+1}`,type:i<5?'PS5':i<10?'PS4':'eRacing'}));
+const SK='psbook_v1';
+let bks=[],nid=1;
+
+function loadData(){
+  try{
+    const d=localStorage.getItem(SK);
+    if(d){const p=JSON.parse(d);bks=p.bks||[];nid=p.nid||1;}
+  }catch(e){}
+}
+
+function getActiveBk(sid){
+  const now=Date.now();
+  return bks.filter(b=>b.sid===sid&&b.status==='a'&&new Date(b.st)<=now&&new Date(b.et)>now)
+    .sort((a,b)=>new Date(a.et)-new Date(b.et))[0]||null;
+}
+
+// ================================================================
+// RENDER STATIONS
+// ================================================================
+function renderStations(){
+  loadData();
+  const bar=document.getElementById('stationBar');
+  let freeC=0,usedC=0;
+
+  const html=STATIONS.map(s=>{
+    const b=getActiveBk(s.id);
+    const rem=b?getRemMs(b.et):0;
+    const isWarning=b&&rem>0&&rem<300000; // < 5 min
+    const isFree=!b||rem<=0;
+
+    if(isFree)freeC++;else usedC++;
+
+    const cls=isFree?'free':(isWarning?'warning':'used');
+
+    let timerHtml='';
+    if(!isFree&&rem>0){
+      timerHtml=`<div class="sb-timer">${fmtCd(rem)}</div>`;
+    }else{
+      timerHtml=`<div class="sb-timer ready">+ READY</div>`;
+    }
+
+    const playerInfo=b?`${b.players||1}P`:'' ;
+    const payIco=b?({'cash':'💵','qr':'📱','fpx':'🏦'}[b.payment||'cash']||''):'';
+
+    const erCls = s.type==='eRacing' ? ' eRacing' : '';
+    return`<div class="station-box ${cls}${erCls}" id="sb-${s.id}">
+      <div class="sb-label">Station ${s.id}</div>
+      <div class="sb-type">${s.type==='eRacing'?'🏎 eR':s.type}</div>
+      ${timerHtml}
+      ${b?`<div class="sb-info">${playerInfo} ${payIco}</div>`:''}
+    </div>`;
+  }).join('');
+
+  bar.innerHTML=html;
+  document.getElementById('freeCount').textContent=freeC;
+  document.getElementById('usedCount').textContent=usedC;
+}
+
+// ================================================================
+// LIVE TIMER UPDATE (no full re-render every second)
+// ================================================================
+function updateTimers(){
+  STATIONS.forEach(s=>{
+    const b=getActiveBk(s.id);
+    const box=document.getElementById(`sb-${s.id}`);
+    if(!box)return;
+    const timer=box.querySelector('.sb-timer');
+    if(!timer)return;
+    if(b){
+      const rem=getRemMs(b.et);
+      if(rem>0){
+        timer.textContent=fmtCd(rem);
+        timer.className='sb-timer';
+        const isWarn=rem<300000;
+        box.className=`station-box ${isWarn?'warning':'used'}`;
+      }else{
+        // expired — re-render
+        renderStations();
+      }
+    }
+  });
+}
+
+// ================================================================
+// CLOCK
+// ================================================================
+function updateClock(){
+  const d=myNow();
+  document.getElementById('clkTime').textContent=`${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`;
+  const days=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+  const months=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+  document.getElementById('clkDate').textContent=`${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ================================================================
+// TICKER
+// ================================================================
+function buildTicker(){
+  const freeC=bks.filter(b=>!getActiveBk(b.sid)).length;
+  const items=[
+    'MAIDA ESPORTS',
+    '🎮 SELAMAT DATANG KE MAIDA ESPORTS',
+    '📺 PAPARAN STESEN LANGSUNG',
+    `✅ ${STATIONS.filter(s=>!getActiveBk(s.id)).length} STESEN TERSEDIA`,
+    '🕹️ BOOK SEKARANG DI KAUNTER',
+    '🏆 MAIDA LEGACY · LA0083119-X',
+    '📍 FINANCIAL PARK LABUAN',
+  ];
+  const txt=items.map(t=>`<span class="ticker-text">${t}</span><span class="ticker-sep">✦</span>`).join('');
+  // duplicate for seamless loop
+  document.getElementById('tickerTrack').innerHTML=txt+txt;
+}
+
+// ================================================================
+// STORAGE CHANGE LISTENER (cross-tab sync)
+// ================================================================
+window.addEventListener('storage',e=>{
+  if(e.key===SK){loadData();renderStations();buildTicker();}
+});
+
+// ================================================================
+// INIT & LOOP
+// ================================================================
+loadData();
+renderStations();
+buildTicker();
+updateClock();
+
+let tick=0;
+setInterval(()=>{
+  updateClock();
+  tick++;
+  // Full re-render every 5 seconds to pick up new bookings
+  if(tick%5===0){loadData();renderStations();buildTicker();}
+  else{updateTimers();}
+},1000);
+</script>
+</body>
+</html>
