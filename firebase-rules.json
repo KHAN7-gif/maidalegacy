@@ -1,0 +1,61 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "mde": {
+      ".read": true,
+
+      "tx": {
+        ".read": true,
+        ".write": "!data.exists()",
+        "$id": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['date','type','amount']) || !newData.exists()",
+          "date":     { ".validate": "newData.isString() && newData.val().length >= 8" },
+          "type":     { ".validate": "newData.isString()" },
+          "amount":   { ".validate": "newData.isNumber()" },
+          "category": { ".validate": "newData.isString()" },
+          "$other":   { ".validate": true }
+        }
+      },
+
+      "ps": {
+        ".read": true,
+        ".write": "!data.exists()",
+        "$id": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['sid']) || !newData.exists()",
+          "$other": { ".validate": true }
+        }
+      },
+
+      "meta":        { ".read": true, ".write": true },
+      "users":       { ".read": true, ".write": true },
+      "ps_meta":     { ".read": true, ".write": true },
+      "ps_stations": { ".read": true, ".write": true },
+      "ps_colors":   { ".read": true, ".write": true },
+      "modules":     { ".read": true, ".write": true },
+      "docs":        { ".read": true, ".write": true },
+      "gaji":        { ".read": true, ".write": true },
+      "staff":       { ".read": true, ".write": true },
+
+      "backup": {
+        ".read": true,
+        "$key": {
+          ".write": "!data.exists()"
+        }
+      },
+
+      "core": {
+        ".read": true,
+        ".write": false
+      },
+      "psbooking": {
+        ".read": true,
+        ".write": false,
+        "rates": { ".write": true }
+      }
+    }
+  }
+}
