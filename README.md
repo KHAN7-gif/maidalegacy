@@ -3,30 +3,40 @@
 Sistem pengurusan kewangan & tempahan PlayStation untuk **Maida Digital Enterprise**
 Financial Park Labuan · LA0083119-X
 
-🔗 https://khan7-gif.github.io/maidalegacy/
+Backend: Node.js + MySQL (Hostinger Web Apps Hosting). Dipindah dari Firebase Realtime Database.
 
 ---
 
 ## Fail dalam repo
 
-| Fail | Guna |
+| Fail/folder | Guna |
 |---|---|
-| `index.html` | Aplikasi penuh (admin + staff) |
-| `firebase-rules.json` | Rules keselamatan Firebase — **wajib dipasang** |
-| `manifest.json` | Tetapan PWA |
-| `sw.js` | Service worker |
-| `icon-192.png` `icon-512.png` | Ikon aplikasi |
+| `public/index.html` | Aplikasi penuh (admin + staff) |
+| `public/manifest.json` | Tetapan PWA |
+| `public/sw.js` | Service worker |
+| `public/icon-192.png` `public/icon-512.png` | Ikon aplikasi |
+| `server/index.js` | Pelayan Express — hidang `public/` + laluan `/api/*` |
+| `server/schema.sql` | Skema MySQL (jalankan sekali semasa persediaan) |
+| `server/migrate-from-firebase.js` | Skrip sekali guna: import data lama dari Firebase |
+| `firebase-rules.json` | Rules Firebase lama — kekal untuk rujukan semasa tempoh rollback |
 
 ---
 
-## Pemasangan
+## Persediaan (Hostinger Web Apps Hosting)
 
-**1. Muat naik `index.html`** ke root repo.
+**1. Aktifkan pelan hosting** — sambungkan Node.js app + Managed MySQL dalam projek hPanel yang sama supaya kelayakan DB disuntik automatik.
 
-**2. Pasang Firebase Rules** (sekali sahaja)
-Firebase Console → Realtime Database → **Rules** → tampal isi `firebase-rules.json` → **Publish**
+**2. Tetapkan pemboleh ubah persekitaran** dalam panel Node.js app:
+   - Kelayakan DB — guna nama pemboleh ubah yang ditunjukkan oleh hPanel (semak `server/db.js`)
+   - `API_SHARED_KEY` — rentetan rawak panjang, mesti sepadan dengan `API_KEY` dalam `public/index.html`
 
-**3. Buka aplikasi** — migrasi data lama berjalan sendiri pada kali pertama.
+**3. Sambungkan repo ini** ke Node.js app (Git-based deploy dalam hPanel), fail masuk: `server/index.js`.
+
+**4. Jalankan `server/schema.sql`** sekali sahaja terhadap MySQL (phpMyAdmin/Adminer dalam hPanel).
+
+**5. Migrasi data lama** — set `FIREBASE_DATABASE_URL` dalam `.env`, kemudian `npm run migrate` (sekali sahaja).
+
+**6. Domain & SSL** — tetapkan domain kepada app Node.js, aktifkan SSL percuma dalam hPanel.
 
 ---
 
@@ -39,32 +49,32 @@ Firebase Console → Realtime Database → **Rules** → tampal isi `firebase-ru
 
 ---
 
-## Struktur data Firebase
+## Struktur data
 
 ```
-mde/
-├── tx/{id}              ← satu transaksi = satu nod  (selamat berbilang pengguna)
-├── ps/{id}              ← satu booking = satu nod
-├── meta                 ← kategori & nota
-├── users                ← akaun & kebenaran
-├── ps_meta              ← nombor booking seterusnya
-├── ps_stations          ← senarai station
-├── ps_colors            ← warna mengikut jenis
-├── psbooking/rates      ← harga, promo, peak hour
-└── backup/{tarikh_jam}  ← salinan automatik setiap jam
+tx/{id}                MySQL: jadual tx        — satu transaksi = satu baris
+ps/{id}                MySQL: jadual ps        — satu booking = satu baris
+gaji/hist/{id}         MySQL: jadual gaji_hist
+syer/hist/{id}         MySQL: jadual syer_hist
+backup/{tarikh_jam}    MySQL: jadual backups   — salinan automatik setiap jam
+meta, users, ps_meta, ps_stations, ps_colors,
+psbooking/rates, modules, docs, gaji, staff,
+core, syer/cfg         MySQL: jadual kv_blobs  — satu blob JSON setiap nod
 ```
 
-**Penting:** setiap rekod disimpan pada nod sendiri. Dua pengguna yang menambah rekod
-berbeza pada masa sama **tidak akan** menimpa kerja satu sama lain.
+**Penting:** setiap rekod `tx`/`ps` disimpan pada baris sendiri (padam adalah "soft delete"
+melalui `deleted_at`). Dua pengguna yang menambah rekod berbeza pada masa sama
+**tidak akan** menimpa kerja satu sama lain.
 
 ---
 
 ## Penyegerakan
 
-- **Sambungan langsung** — perubahan sampai ke semua peranti dalam ~1 saat
-- **Pengawas automatik** — saluran mati dihidupkan semula setiap 10 saat
+- **Polling ~3 saat** — perubahan sampai ke semua peranti dalam ~2-5 saat (gantian kepada
+  sambungan langsung Firebase sebelum ini, yang ~1 saat)
+- **Pengawas automatik** — polling terhenti dihidupkan semula setiap 10 saat
 - **Simpanan tempatan dahulu** — data selamat walaupun internet putus
-- **Backup harian** dalam peranti (7 hari) + backup jam ke Firebase
+- **Backup harian** dalam peranti (7 hari) + backup jam ke pelayan
 
 ---
 

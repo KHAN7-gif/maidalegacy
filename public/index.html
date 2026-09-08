@@ -3243,20 +3243,15 @@ body.amenu-open .ps-mob-nav{ display:none !important }
 
 <script>
 // ================================================================
-//  FIREBASE CONFIG & CLOUD SYNC
+//  BACKEND API CONFIG & CLOUD SYNC (self-hosted on Hostinger)
 // ================================================================
-const FB_CONFIG = {
-  apiKey: "AIzaSyAUZi3ncwhDBk7QyajzKdX8-Lr-Q0OjpAs",
-  authDomain: "maidalegacy-1fe56.firebaseapp.com",
-  databaseURL: "https://maidalegacy-1fe56-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "maidalegacy-1fe56",
-  storageBucket: "maidalegacy-1fe56.firebasestorage.app",
-  messagingSenderId: "449946151084",
-  appId: "1:449946151084:web:ef4d1c62ff9ce22b019709"
-};
+const API_BASE = '/api';
+// Must match API_SHARED_KEY in the server's .env — see .env.example.
+const API_KEY = 'change-me-to-a-long-random-string';
 
-// Firebase REST API helpers (no SDK needed — works in plain HTML)
-const FB_BASE = FB_CONFIG.databaseURL;
+function _apiPath(path){ return String(path).replace(/^mde\//,''); }
+function _apiUrl(path){ return `${API_BASE}/${_apiPath(path)}`; }
+function _apiHeaders(extra){ return {'X-API-Key':API_KEY, ...(extra||{})}; }
 
 // ═══ DIAGNOSIS: simpan sebab sebenar kegagalan ═══
 let FB_LAST_ERR = null;   // {kod, sebab, cadangan, masa}
@@ -3267,25 +3262,22 @@ function _fbSetErr(status, body, path){
     sebab='Tiada sambungan internet';
     cadangan='Semak WiFi / data mudah alih. Data anda selamat di peranti ini.';
   } else if(status === 401 || status === 403){
-    if(/quota|limit|exceeded|payment|billing/i.test(body||'')){
-      sebab='Kuota Firebase habis';
-      cadangan='Pelan percuma sudah mencapai had bulanan. Naik taraf ke Blaze atau tunggu bulan baharu.';
+    if(/too many|rate limit/i.test(body||'')){
+      sebab='Terlalu banyak permintaan';
+      cadangan='Pelayan mengehadkan kadar permintaan buat sementara. Sistem akan cuba lagi automatik.';
     } else {
-      sebab='Firebase Rules menyekat';
-      cadangan='Buka Firebase Console → Realtime Database → Rules, pastikan .read dan .write dibenarkan.';
+      sebab='API_SHARED_KEY tidak sepadan';
+      cadangan='Semak pelayan (.env) dan app (API_KEY dalam index.html) guna kunci yang sama.';
     }
-  } else if(status === 402){
-    sebab='Kuota Firebase habis (402)';
-    cadangan='Had pelan percuma dicapai. Perlu naik taraf atau tunggu kitaran bulan baharu.';
   } else if(status === 404){
-    sebab='Pangkalan data tidak dijumpai';
-    cadangan='Semak URL databaseURL dalam tetapan Firebase.';
+    sebab='Laluan tidak dijumpai di pelayan';
+    cadangan='Semak pelayan sudah dikemas kini dengan laluan API terkini.';
   } else if(status === 408 || status === -1){
     sebab='Sambungan terlalu perlahan (timeout)';
     cadangan='Rangkaian perlahan. Sistem akan cuba lagi automatik.';
   } else if(status >= 500){
-    sebab='Pelayan Firebase bermasalah ('+status+')';
-    cadangan='Masalah di pihak Firebase. Cuba semula sebentar lagi.';
+    sebab='Pelayan bermasalah ('+status+')';
+    cadangan='Semak status Node.js app & MySQL di hPanel Hostinger. Cuba semula sebentar lagi.';
   } else {
     sebab='Ralat '+status;
     cadangan='Tekan lencana status untuk butiran penuh.';
@@ -3302,7 +3294,7 @@ async function fbGet(path){
   try{
     const ctrl=new AbortController();
     const to=setTimeout(()=>ctrl.abort(),8000);
-    const r=await fetch(`${FB_BASE}/${path}.json`,{signal:ctrl.signal});
+    const r=await fetch(_apiUrl(path),{headers:_apiHeaders(),signal:ctrl.signal});
     clearTimeout(to);
     if(!r.ok){
       let body=''; try{ body=await r.text(); }catch(e){}
@@ -3325,14 +3317,14 @@ async function fbSet(path,data){
   if(data&&data.tx&&Array.isArray(data.tx)&&data.tx.length>600)
     data={...data,tx:data.tx.slice(-600)};
   try{const ctrl=new AbortController();setTimeout(()=>ctrl.abort(),12000);
-    const r=await fetch(`${FB_BASE}/${path}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:ctrl.signal});
+    const r=await fetch(_apiUrl(path),{method:'PUT',headers:_apiHeaders({'Content-Type':'application/json'}),body:JSON.stringify(data),signal:ctrl.signal});
     if(r.ok)localStorage.setItem('_fb_save_'+path.replace(/\//g,'_'),String(data._ts||Date.now()));
     return r.ok;
   }catch(e){console.warn('[FB] SET error:',path,e.message);return false;}
 }
 async function fbPatch(path,data){
   try{const ctrl=new AbortController();setTimeout(()=>ctrl.abort(),10000);
-    const r=await fetch(`${FB_BASE}/${path}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:ctrl.signal});
+    const r=await fetch(_apiUrl(path),{method:'PATCH',headers:_apiHeaders({'Content-Type':'application/json'}),body:JSON.stringify(data),signal:ctrl.signal});
     return r.ok;
   }catch(e){console.warn('[FB] PATCH error:',path,e.message);return false;}
 }
@@ -3646,20 +3638,18 @@ function _bersihPs(b){
 async function fbPutRecord(path,obj){
   try{
     const a=new AbortController(); const to=setTimeout(()=>a.abort(),10000);
-    const r=await fetch(FB_BASE+'/'+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(obj),signal:a.signal});
+    const r=await fetch(_apiUrl(path),{method:'PUT',headers:_apiHeaders({'Content-Type':'application/json'}),body:JSON.stringify(obj),signal:a.signal});
     clearTimeout(to);
     if(!r.ok){ let b=''; try{b=await r.text();}catch(e){} _fbSetErr(r.status,b,path); return false; }
     _fbClearErr(); return true;
   }catch(e){ _fbSetErr(e.name==='AbortError'?-1:0, e.message, path); return false; }
 }
 // PATCH menggabungkan anak-anak tanpa menyentuh yang lain.
-// Firebase menilai rules pada setiap laluan anak ($id), jadi ia lulus
-// walaupun nod induk dilindungi ".write": "!data.exists()".
 async function fbPatchRecord(path, obj){
   try{
     const a=new AbortController(); const to=setTimeout(()=>a.abort(),12000);
-    const r=await fetch(FB_BASE+'/'+path+'.json',{
-      method:'PATCH', headers:{'Content-Type':'application/json'},
+    const r=await fetch(_apiUrl(path),{
+      method:'PATCH', headers:_apiHeaders({'Content-Type':'application/json'}),
       body:JSON.stringify(obj), signal:a.signal
     });
     clearTimeout(to);
@@ -3670,7 +3660,7 @@ async function fbPatchRecord(path, obj){
 
 async function fbDelRecord(path){
   try{ const a=new AbortController(); setTimeout(()=>a.abort(),10000);
-    const r=await fetch(FB_BASE+'/'+path+'.json',{method:'DELETE',signal:a.signal});
+    const r=await fetch(_apiUrl(path),{method:'DELETE',headers:_apiHeaders(),signal:a.signal});
     return r.ok; }catch(e){ return false; }
 }
 let _txSnap=new Map();
@@ -4056,9 +4046,9 @@ async function _psSyncCloud(){
       const e = (typeof FB_LAST_ERR!=='undefined' && FB_LAST_ERR) ? FB_LAST_ERR : null;
       const kod = e ? e.status : '?';
       let sebab = 'Sebab tidak diketahui.';
-      if(kod===401||kod===403) sebab = 'Firebase Rules MENOLAK penulisan.\nPerlu betulkan Rules untuk laluan "ps".';
-      else if(kod===0||kod===-1) sebab = 'Sambungan ke Firebase gagal (rangkaian/timeout).';
-      else if(kod) sebab = 'Firebase pulangkan ralat ' + kod + '.';
+      if(kod===401||kod===403) sebab = 'API_SHARED_KEY tidak sepadan — pelayan MENOLAK penulisan.';
+      else if(kod===0||kod===-1) sebab = 'Sambungan ke pelayan gagal (rangkaian/timeout).';
+      else if(kod) sebab = 'Pelayan pulangkan ralat ' + kod + '.';
       const nakBackup = confirm('⚠️ BOOKING TIDAK DAPAT DIHANTAR KE CLOUD\n\n'
         + failed + ' booking tersimpan di peranti ini SAHAJA.\n'
         + 'Peranti lain TIDAK akan nampak sehingga ini selesai.\n\n'
@@ -6564,7 +6554,7 @@ function settingsNav(){
     ['users','👤','Pengguna & Akses','Akaun pengguna'],
     ['roles','🔐','Peranan & Kebenaran','Role & permission'],
     ['data','💾','Data & Backup','Import, export & sandaran'],
-    ['cloud','☁️','Cloud & Sync','Firebase & penyegerakan'],
+    ['cloud','☁️','Cloud & Sync','Pelayan & penyegerakan'],
     ['system','⚙️','Sistem','Tetapan aplikasi']
   ];
   return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;padding:0 12px 16px">
@@ -6700,12 +6690,12 @@ function renderCloudSettings(){
   return `<div class="sec-hdr"><span class="sec-title">☁️ Cloud & Sync</span></div>
   <div style="padding:0 12px 16px">
     <div class="menu-card">
-      <div class="menu-row" style="cursor:default"><div class="m-icon ci-bl">☁️</div><div style="flex:1"><div class="m-label">Firebase Cloud</div><div style="font-size:11px;color:var(--t2)">Penyimpanan & penyegerakan data cloud</div></div><div style="font-size:11px;font-weight:800;color:${navigator.onLine?'#16a34a':'#dc2626'}">● ${navigator.onLine?'ONLINE':'OFFLINE'}</div></div>
-      <div class="menu-row" onclick="pullFromCloud()"><div class="m-icon ci-bl">🔄</div><div style="flex:1"><div class="m-label">Sync dari Cloud</div><div style="font-size:11px;color:var(--t2)">Tarik data terbaru dari Firebase</div></div><div class="m-arr">›</div></div>
+      <div class="menu-row" style="cursor:default"><div class="m-icon ci-bl">☁️</div><div style="flex:1"><div class="m-label">Pelayan Cloud</div><div style="font-size:11px;color:var(--t2)">Penyimpanan & penyegerakan data cloud</div></div><div style="font-size:11px;font-weight:800;color:${navigator.onLine?'#16a34a':'#dc2626'}">● ${navigator.onLine?'ONLINE':'OFFLINE'}</div></div>
+      <div class="menu-row" onclick="pullFromCloud()"><div class="m-icon ci-bl">🔄</div><div style="flex:1"><div class="m-label">Sync dari Cloud</div><div style="font-size:11px;color:var(--t2)">Tarik data terbaru dari pelayan</div></div><div class="m-arr">›</div></div>
       <div class="menu-row" onclick="psPaksaSegerak()"><div class="m-icon ci-gr">📤</div><div style="flex:1"><div class="m-label">Paksa Segerak Semua</div><div style="font-size:11px;color:var(--t2)">Hantar semula semua booking + tarik data terkini</div></div><div class="m-arr">›</div></div>
       <div class="menu-row" onclick="swBaiki()" style="background:linear-gradient(135deg,#fee2e2,#fff)"><div class="m-icon ci-re">🔧</div><div style="flex:1"><div class="m-label">Baiki Service Worker</div><div style="font-size:11px;color:var(--t2)">Nyahdaftar SW &amp; kosongkan cache PWA (data selamat)</div></div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="fbUjiTerus()"><div class="m-icon ci-re">🔌</div><div style="flex:1"><div class="m-label">Uji Sambungan Terus</div><div style="font-size:11px;color:var(--t2)">Papar respons sebenar dari Firebase</div></div><div class="m-arr">›</div></div>
-      <div class="menu-row" onclick="fbDiagnos()"><div class="m-icon ci-or">🔍</div><div style="flex:1"><div class="m-label">Diagnostik Firebase</div><div style="font-size:11px;color:var(--t2)">Uji baca/tulis setiap laluan &amp; tunjuk ralat sebenar</div></div><div class="m-arr">›</div></div>
+      <div class="menu-row" onclick="fbUjiTerus()"><div class="m-icon ci-re">🔌</div><div style="flex:1"><div class="m-label">Uji Sambungan Terus</div><div style="font-size:11px;color:var(--t2)">Papar respons sebenar dari pelayan</div></div><div class="m-arr">›</div></div>
+      <div class="menu-row" onclick="fbDiagnos()"><div class="m-icon ci-or">🔍</div><div style="flex:1"><div class="m-label">Diagnostik Pelayan</div><div style="font-size:11px;color:var(--t2)">Uji baca/tulis setiap laluan &amp; tunjuk ralat sebenar</div></div><div class="m-arr">›</div></div>
     </div>
     <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:16px;padding:16px">
       <div style="font-size:14px;font-weight:900">Status penyegerakan</div>
@@ -6781,14 +6771,14 @@ window.resetLogo=function(){
 };
 window.fbDiagnos = async function(){
   const laluan = ['mde/ps','mde/tx','mde/gaji/hist','mde/syer/hist','mde/syer/cfg','mde/users','mde/ps_meta','mde/psbooking/rates'];
-  let out = '🔍 DIAGNOSTIK FIREBASE\n' + '─'.repeat(34) + '\n';
+  let out = '🔍 DIAGNOSTIK PELAYAN\n' + '─'.repeat(34) + '\n';
   out += 'Internet: ' + (navigator.onLine ? 'ADA ✅' : 'TIADA ❌') + '\n\n';
 
   // 1) Ujian BACA setiap laluan
   out += '📥 BACA:\n';
   for(const p of laluan){
     try{
-      const r = await fetch(FB_BASE+'/'+p+'.json?shallow=true');
+      const r = await fetch(_apiUrl(p),{headers:_apiHeaders()});
       const t = await r.text();
       const bil = (()=>{ try{ const j=JSON.parse(t); return j&&typeof j==='object'?Object.keys(j).length:(j===null?0:1);}catch(e){return '?';} })();
       out += (r.ok?'  ✅ ':'  ❌ ') + p + ' → ' + r.status + (r.ok?(' ('+bil+' rekod)'):'') + '\n';
@@ -6805,12 +6795,12 @@ window.fbDiagnos = async function(){
   ];
   for(const [p,body] of ujian){
     try{
-      const r = await fetch(FB_BASE+'/'+p+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const r = await fetch(_apiUrl(p),{method:'PUT',headers:_apiHeaders({'Content-Type':'application/json'}),body:JSON.stringify(body)});
       if(r.ok){ out += '  ✅ ' + p.replace('/_ujian_','') + ' → boleh tulis\n';
-                try{ await fetch(FB_BASE+'/'+p+'.json',{method:'DELETE'}); }catch(e){} }
+                try{ await fetch(_apiUrl(p),{method:'DELETE',headers:_apiHeaders()}); }catch(e){} }
       else { const tx2 = await r.text().catch(()=>'');
              out += '  ❌ ' + p.replace('/_ujian_','') + ' → ' + r.status +
-                    (r.status===401||r.status===403?' DITOLAK OLEH RULES':'') + '\n';
+                    (r.status===401||r.status===403?' DITOLAK (semak API_SHARED_KEY)':'') + '\n';
              if(tx2) out += '       ' + tx2.slice(0,90) + '\n'; }
     }catch(e){ out += '  ❌ ' + p.replace('/_ujian_','') + ' → rangkaian gagal (0)\n'; }
   }
@@ -6825,52 +6815,45 @@ window.fbDiagnos = async function(){
   if(e2) out += '  Ralat terakhir     : ' + (e2.status!==undefined?e2.status:'?') + ' pada ' + (e2.path||'?') + '\n';
 
   out += '\n' + '─'.repeat(34) + '\n';
-  out += 'Semua ✅ = sambungan sihat.\n401/403 = betulkan Firebase Rules.\n0 = permintaan disekat / DB tak dapat dicapai.';
+  out += 'Semua ✅ = sambungan sihat.\n401/403 = semak API_SHARED_KEY sepadan di pelayan & app.\n0 = permintaan disekat / pelayan tak dapat dicapai.';
   alert(out);
   console.log(out);
 
   // Kalau SEMUA gagal dengan (0) — beri langkah pasti, bukan tekaan
   if(out.indexOf('✅') === -1){
-    const url = FB_BASE + '/mde.json?shallow=true';
     const nak = confirm(
       '❗ SEMUA permintaan gagal dengan (0)\n\n'
-      + 'Ini BUKAN masalah Rules — permintaan tidak sampai ke Firebase langsung.\n\n'
+      + 'Permintaan tidak sampai ke pelayan langsung.\n\n'
       + 'Punca biasa:\n'
-      + '  1. Extension penyekat iklan/privasi menyekat firebasedatabase.app\n'
-      + '  2. Kuota Firebase percuma habis / DB dilumpuhkan\n'
-      + '  3. Rangkaian atau DNS menyekat\n\n'
-      + 'UJIAN PASTI: buka URL pangkalan data terus dalam tab baharu.\n'
-      + 'Kalau ia buka & tunjuk data → extension yang menyekat.\n'
-      + 'Kalau ia tunjuk ralat → itulah ralat sebenar Firebase.\n\n'
-      + 'Buka URL itu sekarang?');
-    if(nak) window.open(url, '_blank');
+      + '  1. Pelayan Node.js di Hostinger tidak berjalan / dihentikan\n'
+      + '  2. Rangkaian atau DNS menyekat\n'
+      + '  3. Extension penyekat iklan/privasi\n\n'
+      + 'Semak status pelayan di hPanel sekarang?');
+    if(nak) console.log('Semak hPanel → Node.js app → Logs/Status');
     if(typeof swKesanMasalah==='function'){ try{ await swKesanMasalah(); }catch(e){} }
   }
 };
 
-// Ujian sambungan mentah — papar respons Firebase yang sebenar
+// Ujian sambungan mentah — papar respons pelayan yang sebenar
 window.fbUjiTerus = async function(){
-  const url = FB_BASE + '/mde.json?shallow=true';
+  const url = API_BASE + '/_ping';
   let out = '🔌 UJIAN SAMBUNGAN TERUS\n' + '─'.repeat(30) + '\n' + url + '\n\n';
   try{
-    const r = await fetch(url);
+    const r = await fetch(url,{headers:_apiHeaders()});
     const t = (await r.text()).slice(0,300);
     out += 'Status : ' + r.status + ' ' + r.statusText + '\n';
     out += 'Respons: ' + t + '\n\n';
-    out += r.ok ? '✅ Firebase BOLEH dihubungi. Masalah di tempat lain.'
-                : (r.status===401||r.status===403 ? '❌ Ditolak Rules.'
-                : '❌ Firebase pulangkan ralat ' + r.status + '.');
+    out += r.ok ? '✅ Pelayan BOLEH dihubungi. Masalah di tempat lain.'
+                : (r.status===401||r.status===403 ? '❌ Ditolak — API_SHARED_KEY tidak sepadan.'
+                : '❌ Pelayan pulangkan ralat ' + r.status + '.');
   }catch(e){
-    out += '❌ GAGAL SEBELUM SAMPAI FIREBASE\n';
+    out += '❌ GAGAL SEBELUM SAMPAI PELAYAN\n';
     out += 'Ralat: ' + (e && e.message ? e.message : e) + '\n\n';
-    out += 'Bermakna permintaan disekat oleh pelayar/rangkaian.\n'
+    out += 'Bermakna permintaan disekat oleh pelayar/rangkaian sebelum sampai ke app.\n'
         +  'Cuba: (1) mod Incognito tanpa extension,\n'
-        +  '      (2) pelayar lain, (3) data mudah alih.\n\n'
-        +  'Klik OK untuk buka URL terus — kalau ia BUKA,\n'
-        +  'bermakna extension menyekat app ini.';
+        +  '      (2) pelayar lain, (3) data mudah alih.';
   }
   alert(out); console.log(out);
-  window.open(url,'_blank');
 };
 
 window.psPaksaSegerak = async function(){
@@ -6885,7 +6868,7 @@ window.psPaksaSegerak = async function(){
   try{ render(); }catch(e){}
   const baki = (typeof _psDirty!=='undefined') ? _psDirty.size : 0;
   alert(baki===0 ? '✅ Semua booking telah dihantar & data terkini dimuat turun.'
-                 : '⚠️ ' + baki + ' booking masih gagal dihantar.\nJalankan "Diagnostik Firebase" untuk lihat sebabnya.');
+                 : '⚠️ ' + baki + ' booking masih gagal dihantar.\nJalankan "Diagnostik Pelayan" untuk lihat sebabnya.');
 };
 
 function renderSystemSettings(){
@@ -10975,10 +10958,10 @@ window.swKesanMasalah = async function(){
   try{ const regs = await navigator.serviceWorker.getRegistrations(); aktif = regs.length>0; }catch(e){}
   if(!aktif) return false;
   let bolehCapai = false;
-  try{ const r = await fetch(FB_BASE+'/mde.json?shallow=true',{cache:'no-store'}); bolehCapai = r.ok; }catch(e){ bolehCapai = false; }
+  try{ const r = await fetch(API_BASE+'/_ping',{headers:_apiHeaders(),cache:'no-store'}); bolehCapai = r.ok; }catch(e){ bolehCapai = false; }
   if(bolehCapai) return false;
   const nak = confirm('🔧 MASALAH DIKESAN\n\n'
-    + 'App tidak dapat hubungi Firebase, tetapi pangkalan data itu SIHAT.\n'
+    + 'App tidak dapat hubungi pelayan, tetapi pelayan itu SIHAT.\n'
     + 'Punca: Service Worker (cache PWA) menyekat permintaan app.\n\n'
     + 'Baiki sekarang? App akan dimuat semula.\n'
     + '(Data tempatan anda TIDAK akan dipadam.)');
@@ -11646,10 +11629,10 @@ async function fbTestConn(){
   if(o) o.innerHTML='<span style="color:#d97706">⏳ Menguji…</span>';
   const t0=Date.now();
   try{
-    const r=await fetch(FB_BASE+'/.json?shallow=true');
+    const r=await fetch(API_BASE+'/_ping',{headers:_apiHeaders()});
     const ms=Date.now()-t0;
     if(r.ok){
-      if(o) o.innerHTML='<span style="color:#059669;font-weight:800">✅ Firebase boleh dihubungi ('+ms+'ms). Kuota masih ada.</span>';
+      if(o) o.innerHTML='<span style="color:#059669;font-weight:800">✅ Pelayan boleh dihubungi ('+ms+'ms).</span>';
       _fbClearErr(); showSyncStatus('ok');
     } else {
       let b=''; try{b=await r.text();}catch(e){}
@@ -11657,7 +11640,7 @@ async function fbTestConn(){
       if(o) o.innerHTML='<span style="color:#dc2626;font-weight:800">❌ '+FB_LAST_ERR.sebab+'</span><br>'+FB_LAST_ERR.cadangan;
     }
   }catch(e){
-    if(o) o.innerHTML='<span style="color:#dc2626;font-weight:800">❌ Tiada sambungan ke Firebase.</span><br>Semak internet peranti.';
+    if(o) o.innerHTML='<span style="color:#dc2626;font-weight:800">❌ Tiada sambungan ke pelayan.</span><br>Semak internet peranti.';
   }
 }
 
@@ -11669,12 +11652,16 @@ window.addEventListener('offline',()=>{ _fbSetErr(0,'','peranti'); showSyncStatu
 
 // ═══════════════════════════════════════════════════════════
 //  SAMBUNGAN LANGSUNG (REAL-TIME) — semua peranti serentak
-//  Firebase tolak perubahan terus, tiada tunggu 5 minit.
-//  Guna data LEBIH SEDIKIT dari polling — hanya perubahan dihantar.
+//  Firebase RTDB's SSE stream digantikan dengan polling ~3 saat
+//  terhadap /_changes?since=, sejak pelayan sendiri (bukan Firebase)
+//  yang hos pangkalan data sekarang. Reka bentuk _rtSetPath dan
+//  setiap onData callback (rtStartTx, rtStartPs, dll.) TIDAK berubah —
+//  keduanya cuma mengguna (path, data, kind), tanpa peduli pengangkutan.
 // ═══════════════════════════════════════════════════════════
-let _rtStreams = {};        // path -> EventSource
+let _rtStreams = {};        // path -> interval id
 let _rtOn = false;
 let _rtRetry = {};
+let _rtCursor = {};         // path -> jam pelayan (server_time) untuk since=
 
 function _rtSetPath(obj, path, data){
   // path '/'          → keseluruhan
@@ -11708,52 +11695,53 @@ let _rtHandlers = {};         // path -> fungsi onData (untuk sambung semula)
 
 function _rtTouch(path){ _rtLastMsg[path] = Date.now(); }
 
-function _rtStart(path, onData){
+const RT_POLL_MS = 3000;
+
+async function _rtStart(path, onData){
   if(_rtStreams[path]) return;
-  if(typeof EventSource === 'undefined') return;
   _rtHandlers[path] = onData;
+
+  // Snapshot penuh dahulu (sama seperti SSE menghantar 'put' penuh bila sambung),
+  // kemudian jam pelayan diambil sebagai titik mula supaya tiada pincang jam peranti.
   try{
-    const es = new EventSource(FB_BASE + '/' + path + '.json');
-    _rtStreams[path] = es;
+    const snap = await fbGet(path);
+    onData('/', snap, 'put');
     _rtTouch(path);
+    _rtOn = true; _fbClearErr(); showSyncStatus('ok');
+  }catch(e){ /* fbGet sendiri sudah rekod ralat */ }
+  try{
+    const r = await fetch(API_BASE+'/_ping',{headers:_apiHeaders()});
+    const j = await r.json();
+    _rtCursor[path] = j.time || Date.now();
+  }catch(e){ _rtCursor[path] = Date.now(); }
 
-    // Firebase hantar keep-alive setiap ~30s — ini bukti saluran masih hidup
-    es.addEventListener('keep-alive', () => _rtTouch(path));
-    es.addEventListener('message',    () => _rtTouch(path));
-    es.addEventListener('auth_revoked',() => { try{es.close();}catch(e){} delete _rtStreams[path]; });
+  _rtStreams[path] = setInterval(async () => {
+    try{
+      const since = _rtCursor[path] || 0;
+      const r = await fetch(`${API_BASE}/${_apiPath(path)}/_changes?since=${since}`,{headers:_apiHeaders()});
+      if(!r.ok){ _rtSetErrIfNeeded(r); return; }
+      const j = await r.json();
+      _rtCursor[path] = j.server_time || Date.now();
+      _rtTouch(path);
+      _rtRetry[path] = 0; _rtOn = true; _fbClearErr(); showSyncStatus('ok');
+      if(Array.isArray(j.rows)) j.rows.forEach(row => onData('/'+row.id, row.data, 'put'));
+      else if(j.changed) onData('/', j.data, 'put');
+    }catch(e){ /* pengawas (rtWatchdog) akan cuba sambung semula jika berterusan */ }
+  }, RT_POLL_MS);
+  console.log('[RT] Polling aktif: '+path);
+}
 
-    es.addEventListener('put', ev => {
-      _rtTouch(path);
-      try{ const m = JSON.parse(ev.data); onData(m.path, m.data, 'put'); _rtOn = true;
-           _fbClearErr(); showSyncStatus('ok'); }catch(e){}
-    });
-    es.addEventListener('patch', ev => {
-      _rtTouch(path);
-      try{ const m = JSON.parse(ev.data); onData(m.path, m.data, 'patch'); }catch(e){}
-    });
-    es.addEventListener('cancel', () => {
-      console.warn('[RT] Dibatalkan: '+path+' (semak Firebase Rules)');
-      _fbSetErr(403,'stream cancelled',path);
-      showSyncStatus('error');
-    });
-    es.onerror = () => {
-      const n = (_rtRetry[path] = (_rtRetry[path]||0) + 1);
-      const wait = Math.min(20000, 1500 * n);
-      try{ es.close(); }catch(e){}
-      delete _rtStreams[path];
-      setTimeout(()=>_rtStart(path, onData), wait);
-    };
-    es.onopen = () => { _rtRetry[path] = 0; _rtTouch(path); console.log('[RT] Langsung: '+path); };
-  }catch(e){ console.warn('[RT] Gagal mula '+path, e.message); }
+async function _rtSetErrIfNeeded(r){
+  let b=''; try{b=await r.text();}catch(e){}
+  _fbSetErr(r.status,b,'_changes');
 }
 
 // Paksa sambung semula satu saluran
 function _rtRestart(path){
   const h = _rtHandlers[path];
-  const es = _rtStreams[path];
-  if(es){ try{ es.close(); }catch(e){} }
-  delete _rtStreams[path];
+  if(_rtStreams[path]){ clearInterval(_rtStreams[path]); delete _rtStreams[path]; }
   delete _rtLastMsg[path];
+  delete _rtCursor[path];
   if(h) setTimeout(()=>_rtStart(path, h), 150);
 }
 
@@ -11987,123 +11975,46 @@ window.addEventListener('online',  ()=> setTimeout(rtStartAll, 1200));
 // Sambung semula bila skrin dibuka (iOS tutup sambungan bila skrin mati)
 document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState === 'visible'){
-    // iOS bunuh sambungan bila skrin mati — sambung semula & tarik segera
+    // iOS boleh diamkan setTimeout/setInterval bila skrin mati — sambung semula & tarik segera
     Object.keys(_rtStreams).forEach(p => _rtRestart(p));
     setTimeout(rtWatchdog, 600);
-    setTimeout(_pollSekali, 300);
   }
 });
 
 // ═══════════════════════════════════════════════════════════
 //  PENGAWAS AUTOMATIK — tiada campur tangan pengguna
-//  Semak setiap 10 saat. Mana-mana saluran mati → hidupkan balik.
-//  Kalau pelayar tak sokong streaming → tarik data berkala.
+//  Semak setiap 10 saat. Mana-mana polling terhenti/senyap → hidupkan balik.
 // ═══════════════════════════════════════════════════════════
 const RT_PERLU = ['mde/tx','mde/ps','mde/users','mde/ps_stations','mde/ps_colors','mde/psbooking/rates','mde/syer/hist'];
-let _rtWatch = null, _rtFallback = null;
+let _rtWatch = null;
 
-const RT_MATI_MS = 70000;   // tiada mesej 70s = saluran mati (keep-alive ~30s)
+const RT_MATI_MS = 70000;   // tiada respons 70s (~23 pusingan poll 3s) = anggap terhenti
 
 function rtWatchdog(){
   if(typeof currentUser === 'undefined' || !currentUser) return;
-  if(typeof EventSource === 'undefined'){ rtFallbackMode(); return; }
 
   const kini = Date.now();
   let hidupkan = 0, zombi = 0;
 
   RT_PERLU.forEach(p => {
-    const es = _rtStreams[p];
-
-    // (a) Tiada langsung, atau sudah CLOSED
-    if(!es || es.readyState === 2){
-      if(es){ try{ es.close(); }catch(e){} delete _rtStreams[p]; }
-      hidupkan++;
+    // (a) Tiada polling aktif langsung
+    if(!_rtStreams[p]){
+      const h = _rtHandlers[p];
+      if(h){ _rtStart(p, h); hidupkan++; }
       return;
     }
 
-    // (b) ZOMBI — lapor OPEN tetapi senyap terlalu lama
+    // (b) ZOMBI — interval masih jalan tetapi senyap terlalu lama (mis. tab tidur)
     const akhir = _rtLastMsg[p] || 0;
     if(kini - akhir > RT_MATI_MS){
-      console.warn('[RT] Saluran zombi: '+p+' senyap '+Math.round((kini-akhir)/1000)+'s — sambung semula');
+      console.warn('[RT] Senyap '+p+' selama '+Math.round((kini-akhir)/1000)+'s — sambung semula');
       _rtRestart(p);
       zombi++;
     }
   });
 
-  if(hidupkan > 0){
-    console.log('[RT] Pengawas: hidupkan '+hidupkan+' saluran');
-    rtStartAll();
-  }
+  if(hidupkan > 0) console.log('[RT] Pengawas: hidupkan '+hidupkan+' saluran');
   if(zombi > 0) showSyncStatus('syncing');
-}
-
-// Jika pelayar lama / streaming disekat rangkaian → tarik data setiap 20 saat
-// Tarikan sandaran — sentiasa aktif sebagai jaring keselamatan.
-// Walaupun semua saluran gagal, data tetap dikemas kini setiap 15 saat.
-let _fbPollTimer = null;
-let _pollBusy = false;
-
-async function _pollSekali(){
-  if(_pollBusy) return;
-  if(typeof currentUser === 'undefined' || !currentUser) return;
-  _pollBusy = true;
-  try{
-    // Booking PS — paling kerap berubah
-    const cloud = await fbGet('mde/ps');
-    if(cloud && typeof cloud === 'object'){
-      const arr = Object.values(cloud).filter(b => b && b.id != null);
-      const byId = new Map();
-      arr.forEach(b => {
-        const k = String(b.id);
-        if(byId.has(k)){ b.id = newId(); if(typeof _psDirty!=='undefined') _psDirty.add(String(b.id)); }
-        byId.set(String(b.id), b);
-      });
-      if(typeof _psDirty !== 'undefined') ps_bks.forEach(b => { const id=String(b.id); if(_psDirty.has(id)) byId.set(id, b); });
-      if(typeof _psDeadAktif==='function') _psDeadAktif().forEach(id => byId.delete(id));
-      const baru = [...byId.values()];
-      if(JSON.stringify(baru) !== JSON.stringify(ps_bks)){
-        ps_bks = baru;
-        try{ localStorage.setItem(PS_SK, JSON.stringify({bks:ps_bks, nid:ps_nid})); }catch(e){}
-        if(typeof _psRebuildSnap === 'function') _psRebuildSnap();
-        if(typeof tvRefreshLinked==='function') tvRefreshLinked();
-        if(typeof activeTab !== 'undefined' && activeTab === 'ps_booking'){
-          try{
-            if(ps_av==='panel')    psRPanel();
-            if(ps_av==='senarai')  psRList();
-            if(ps_av==='analisis') psRAnalFull();
-            if(typeof psUpdStats === 'function') psUpdStats();
-          }catch(e){}
-        }
-        console.log('[Poll] Booking dikemas kini');
-      }
-    }
-
-    // Transaksi
-    const ctx = await fbGet('mde/tx');
-    if(ctx && typeof ctx === 'object'){
-      const before=_financeFingerprint(tx);
-      tx=_mergeFinanceFromCloud(ctx);
-      const after=_financeFingerprint(tx);
-      if(before!==after){
-        try{ localStorage.setItem(SK_TX, JSON.stringify(tx)); }catch(e){}
-        if(typeof _rebuildSnap === 'function') _rebuildSnap();
-        if(typeof activeTab !== 'undefined'
-           && ['home','calendar','record','analytic','sst_report','ops'].includes(activeTab)){
-          try{ render(); }catch(e){}
-        }
-        console.log('[Poll] Finance SOT dikemas kini · '+before+' → '+after);
-      }
-    }
-  }catch(e){}
-  _pollBusy = false;
-}
-
-function rtFallbackMode(){ startPolling(); }
-
-function startPolling(){
-  if(_fbPollTimer) return;
-  _fbPollTimer = setInterval(_pollSekali, 15000);
-  console.log('[Poll] Tarikan sandaran aktif (15s)');
 }
 
 // Mulakan pengawas sebaik sahaja fail dimuat
@@ -12111,8 +12022,6 @@ function rtBoot(){
   if(_rtWatch) clearInterval(_rtWatch);
   _rtWatch = setInterval(rtWatchdog, 10000);
   setTimeout(rtWatchdog, 1500);
-  startPolling();                    // jaring keselamatan sentiasa hidup
-  setTimeout(_pollSekali, 3000);
 }
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', rtBoot);
 else rtBoot();
@@ -13004,7 +12913,7 @@ function showBandwidthUsage(){
   const el = document.getElementById('fb-sync-dot');
   if(el && bytes > 1024*1024){
     const warn = bytes > 10*1024*1024;
-    el.title = `Firebase downloaded: ${mb}MB this session`;
+    el.title = `Server downloaded: ${mb}MB this session`;
     if(warn) console.warn(`[FB] Session download: ${mb}MB`);
   }
 }

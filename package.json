@@ -1,0 +1,20 @@
+{
+  "name": "mde-finance-pro-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MDE Finance Pro backend (Node.js + MySQL) — replaces Firebase Realtime Database on Hostinger",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "migrate": "node server/migrate-from-firebase.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "mysql2": "^3.11.0"
+  }
+}

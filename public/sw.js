@@ -13,8 +13,8 @@
 //     yang menyebabkan ralat rangkaian palsu).
 // ================================================================
 
-const SW_VERSION = 'mde-sw-v3';
-const CACHE_NAME = 'mde-cache-v3';
+const SW_VERSION = 'mde-sw-v4';
+const CACHE_NAME = 'mde-cache-v4';
 
 // Hanya aset statik yang jarang berubah
 const CACHE_FILES = [
@@ -68,6 +68,10 @@ self.addEventListener('fetch', event => {
 
   // 2) Lepaskan SECARA JELAS semua trafik pangkalan data / API.
   //    (Perlindungan berganda — supaya SW tidak sekali-kali mengganggu sync.)
+  //    Backend kini sama-origin (/api/*) sejak berpindah dari Firebase ke
+  //    Hostinger — WAJIB dilepaskan di sini, atau SW akan cache respons
+  //    polling dan app akan nampak data lapuk.
+  if (new URL(url).pathname.startsWith('/api/')) return;
   if (url.includes('firebasedatabase.app') ||
       url.includes('firebaseio.com') ||
       url.includes('googleapis.com/identitytoolkit') ||
