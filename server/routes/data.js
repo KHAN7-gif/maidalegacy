@@ -76,7 +76,9 @@ async function handleCollection(req, res, node, rest) {
   if (rest === '_changes') {
     if (req.method !== 'GET') return res.status(405).json({ error: 'method not allowed' });
     const since = Number(req.query.since || 0);
-    const [rows] = await pool.query(`SELECT * FROM ${table} WHERE updated_at > ?`, [since]);
+    // Include the cursor boundary. The client may receive the same row once;
+    // that is harmless and prevents a same-millisecond write being missed.
+    const [rows] = await pool.query(`SELECT * FROM ${table} WHERE updated_at >= ?`, [since]);
     return res.json({
       rows: rows.map(row => ({
         id: row.id,

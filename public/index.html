@@ -3627,9 +3627,11 @@ function _bersihPs(b){
   o.payment = String(b.payment || 'cash');
   if(b.st) o.st = String(b.st);
   if(b.et) o.et = String(b.et);
-  ['joy','xDS4','xDS5','loyalty','lref','notes'].forEach(k=>{
+  ['joy','xDS4','xDS5','loyalty','lref','notes','staffId','staffName'].forEach(k=>{
     if(b[k] !== undefined && b[k] !== null && b[k] !== ''){
-      o[k] = (typeof b[k] === 'boolean') ? b[k] : (isNaN(b[k]) ? String(b[k]) : Number(b[k]));
+      o[k] = (typeof b[k] === 'boolean') ? b[k]
+        : (k==='staffId' || k==='staffName' ? String(b[k])
+        : (isNaN(b[k]) ? String(b[k]) : Number(b[k])));
     }
   });
   return o;
@@ -8537,6 +8539,12 @@ function psSetBF(f,v){ps_bF[f]=v;if(f==='players')ps_bF.joy=v;psRBook();}
 function psTExt(id){ps_bF[id]=!ps_bF[id];psRBook();}
 function psTogLoy(){ps_bF.loyalty=!ps_bF.loyalty;psRBook();}
 function psSetNow(){ps_bF.st=psMyDtLocal();psRBook();}
+function resolveActiveStaffMeta(){
+  const candidate = currentUser || (lockSelectedUser ? appUsers.find(u => u.username && u.username.toLowerCase() === String(lockSelectedUser).trim().toLowerCase()) : null) || appUsers[0] || null;
+  const id = candidate && (candidate.id || candidate.username) ? String(candidate.id || candidate.username) : '';
+  const name = candidate && candidate.username ? String(candidate.username) : '';
+  return { id, name, role: candidate && candidate.role ? String(candidate.role) : 'Staff' };
+}
 function psSaveBk(){
   if(!ps_bF.sid){psToast('Pilih station','r');return;}
   if(!ps_bF.payment){psToast('Pilih kaedah bayaran','r');return;}
@@ -8545,7 +8553,8 @@ function psSaveBk(){
   const bookDate=`${myStart.getFullYear()}-${psMy2(myStart.getMonth()+1)}-${psMy2(myStart.getDate())}`;
   if(psHasOvlp(ps_bF.sid,bookDate,sd,ed)){psToast('Masa bertindih dengan booking lain','r');return;}
   const stObj=PS_STATIONS.find(s=>s.id===ps_bF.sid);
-  const bk={id:newId(),no:ps_nid++,sid:ps_bF.sid,players:ps_bF.players,payment:ps_bF.payment,joy:ps_bF.joy,dur:ps_bF.dur,st:sd.toISOString(),et:ed.toISOString(),date:bookDate,loyalty:ps_bF.loyalty,lref:ps_bF.lref,notes:ps_bF.notes,amt:psCalcTot(ps_bF),status:'a',xDS4:ps_bF.xDS4,xDS5:ps_bF.xDS5};
+  const staffMeta = resolveActiveStaffMeta();
+  const bk={id:newId(),no:ps_nid++,sid:ps_bF.sid,players:ps_bF.players,payment:ps_bF.payment,joy:ps_bF.joy,dur:ps_bF.dur,st:sd.toISOString(),et:ed.toISOString(),date:bookDate,loyalty:ps_bF.loyalty,lref:ps_bF.lref,notes:ps_bF.notes,amt:psCalcTot(ps_bF),status:'a',xDS4:ps_bF.xDS4,xDS5:ps_bF.xDS5,staffId:staffMeta.id,staffName:staffMeta.name};
   ps_bks.push(bk);psSave();
   const _pwaStName=stObj?.name||'Station '+bk.sid;
   pwaScheduleTimer(bk.id,bk.sid,_pwaStName,bk.et,bk.amt);
@@ -9932,6 +9941,7 @@ window.tryLogin = () => {
   if(!user){showError('Incorrect username or password');return;}
   if(encPwd(pass)===user.password){
     currentUser=user;
+    lockSelectedUser = user.username;
     const ls=document.getElementById('lockScreen'); if(ls) ls.style.display='none';
     const tm=document.getElementById('lockTimeoutMsg'); if(tm) tm.style.display='none';
     document.getElementById('lockError').classList.remove('show');
@@ -11701,19 +11711,19 @@ async function _rtStart(path, onData){
   if(_rtStreams[path]) return;
   _rtHandlers[path] = onData;
 
-  // Snapshot penuh dahulu (sama seperti SSE menghantar 'put' penuh bila sambung),
-  // kemudian jam pelayan diambil sebagai titik mula supaya tiada pincang jam peranti.
+  // Ambil cursor dahulu, kemudian snapshot penuh. Jika ada write semasa snapshot,
+  // polling seterusnya masih akan mengambilnya dan tiada rekod terlepas.
+  try{
+    const r = await fetch(API_BASE+'/_ping',{headers:_apiHeaders()});
+    const j = await r.json();
+    _rtCursor[path] = j.time || Date.now();
+  }catch(e){ _rtCursor[path] = Date.now(); }
   try{
     const snap = await fbGet(path);
     onData('/', snap, 'put');
     _rtTouch(path);
     _rtOn = true; _fbClearErr(); showSyncStatus('ok');
   }catch(e){ /* fbGet sendiri sudah rekod ralat */ }
-  try{
-    const r = await fetch(API_BASE+'/_ping',{headers:_apiHeaders()});
-    const j = await r.json();
-    _rtCursor[path] = j.time || Date.now();
-  }catch(e){ _rtCursor[path] = Date.now(); }
 
   _rtStreams[path] = setInterval(async () => {
     try{

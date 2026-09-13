@@ -8,6 +8,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
+const hasDbConfig = !!(process.env.DB_HOST || process.env.MYSQL_HOST || process.env.DB_NAME || process.env.MYSQL_DATABASE);
+const hasApiKey = !!process.env.API_SHARED_KEY;
+
+console.log(`[server] starting on port ${PORT}`);
+console.log(`[server] DB configured: ${hasDbConfig ? 'yes' : 'no (set DB_* or MYSQL_* env vars)'}`);
+console.log(`[server] API_SHARED_KEY configured: ${hasApiKey ? 'yes' : 'no (set it in .env before using /api)'}`);
+
 // Hostinger's edge/Passenger layer sits in front of the app and sets
 // X-Forwarded-For; without this, express-rate-limit can't tell real client
 // IPs apart and logs a warning on every request.
