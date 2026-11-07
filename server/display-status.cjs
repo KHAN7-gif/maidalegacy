@@ -15,8 +15,8 @@ router.get('/status', async (req, res) => {
     const now = Date.now();
     res.set('Cache-Control', 'no-store');
     res.json({ stations: stations.filter(s => s.active !== false).map(s => {
-      const active = bookings.filter(b => String(b.sid) === String(s.id) && b.status === 'a' && new Date(b.st).getTime() <= now && new Date(b.et).getTime() > now);
-      const end = Math.max(0, ...active.map(b => new Date(b.et).getTime()));
+      const active = bookings.find(b => Number(b.sid) === Number(s.id) && b.status === 'a' && new Date(b.st).getTime() <= now && new Date(b.et).getTime() > now);
+      const end = active ? new Date(active.et).getTime() : 0;
       return { id: s.id, name: s.name, type: s.type, endsAt: end ? new Date(end).toISOString() : null };
     }) });
   } catch { res.status(503).json({ error: 'status unavailable' }); }
