@@ -21,6 +21,7 @@ console.log(`[server] API_SHARED_KEY configured: ${hasApiKey ? 'yes' : 'no (set 
 app.set('trust proxy', 1);
 
 app.use(express.json({ limit: '2mb' }));
+app.use('/display-api', apiRateLimit, require('./display-status.cjs'));
 app.use('/api', apiRateLimit, apiKeyAuth, dataRouter);
 
 app.use(express.static(PUBLIC_DIR));
